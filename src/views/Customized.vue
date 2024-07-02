@@ -286,7 +286,6 @@
                         '/src/assets/pic/customized/icon-7.png',
                         '/src/assets/pic/customized/icon-8.png',
                         '/src/assets/pic/customized/icon-9.png',
-                        '/src/assets/pic/customized/icon-10.png',
                     ],
                 },
 
