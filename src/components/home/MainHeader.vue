@@ -1,92 +1,9 @@
-<!-- <template>
-    <header>
-        <div class="header-nav">
-            <div class="logo">
-                <RouterLink to="/"><img src="../../assets/pic/logo.png" alt="logo"></RouterLink>
-            </div>
-            <nav class="desktop-menu">
-                <ul>
-                    <li v-for="link in links" :key="link.path">
-                        <RouterLink :to="link.path">{{ link.name }}</RouterLink>
-                        <ul v-if="link.submenu">
-                            <li v-for="sublink in link.submenu" :key="sublink.path">
-                                <RouterLink :to="sublink.path">{{ sublink.name }}</RouterLink>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
-            </nav>
-            <div class="icons">
-                <button>
-                    <RouterLink to="/cart">
-                        <img src="../../assets/pic/icon_cart.svg" alt="購物車">
-                    </RouterLink>
-                </button>
-                <button>
-                    <a href="#" @click="loginIn">
-                    <img src="../../assets/pic/icon_user.svg" alt="會員登入/註冊">
-                    </a>
-                </button>
-                <button @click="toggleMenu" class="hamberger-menu">
-                    <i class="fa-solid fa-bars"></i>
-                </button>
-            </div>
-        </div>
-        <div v-if="menuOpen" class="mobile-menu">
-            <ul>
-                <li v-for="link in links" :key="link.path">
-                    <RouterLink :to="link.path" @click="toggleMenu">{{ link.name }}</RouterLink>
-                    <ul v-if="link.submenu">
-                        <li v-for="sublink in link.submenu" :key="sublink.path">
-                            <RouterLink :to="sublink.path" @click="toggleMenu">{{ sublink.name }}</RouterLink>
-                        </li>
-                    </ul>
-                </li>
-            </ul>
-        </div>
-    </header>
-</template>
-
-<script>
-import { RouterLink } from 'vue-router';
-
-export default {
-    components: {
-        RouterLink,
-    },
-    data() {
-        return {
-            links: [
-                { name: '關於我們', path: '/about', submenu: [{ name: '品牌故事', path: '/aboutstory' }, { name: '歷史沿革', path: '#' }] },
-                { name: '最新消息', path: '/news' },
-                { name: '活動資訊', path: '/activity' },
-                { name: '周邊商品', path: '/product' },
-                { name: '知識小學堂', path: '/quiz' }
-            ],
-            menuOpen: false,
-        };
-    },
-    methods: {
-        login() {
-            const loginBox = document.querySelector(".login-box");
-            loginBox.style.opacity = "1";
-            loginBox.style.pointerEvents = "auto";
-        },
-        toggleMenu() {
-            this.menuOpen = !this.menuOpen;
-        }
-    }
-}
-</script> -->
-
 <template>
     <header>
         <div class="header-nav">
             <div class="logo">
                 <RouterLink to="/"><img class="desktop-logo" src="../../assets/pic/logo.png" alt="logo"></RouterLink>
-                <RouterLink to="/"><img class="mobile-logo" src="../../assets/pic/logo-mobile.svg" alt="logo">
-                </RouterLink>
-
+                <RouterLink to="/"><img class="mobile-logo" src="../../assets/pic/logo-mobile.svg" alt="logo"></RouterLink>
             </div>
             <nav class="desktop-menu">
                 <ul>
@@ -101,6 +18,7 @@ export default {
                             </li>
                         </ul>
                     </li>
+                    <li class="sign-out" @click="signOut">登出</li>
                 </ul>
             </nav>
             <div class="icons">
@@ -121,10 +39,10 @@ export default {
                     </a>
                 </button>
                 <button class="member">王曉明
-                        <ul>
-                            <router-link to="/memberinfo">會員資訊</router-link>
-                            <li @click="signOut">登出</li>
-                        </ul>
+                    <ul>
+                        <router-link class="mem-info" to="/memberinfo">會員資訊</router-link>
+                        <li class="sign-out" @click="signOut">登出</li>
+                    </ul>
                 </button>
 
                 <button @click="toggleMenu" class="hamburger-menu">
@@ -132,13 +50,9 @@ export default {
                 </button>
             </div>
         </div>
-        <!-- <div v-if="menuOpen" class="overlay" @click="toggleMenu"></div> -->
-        <!-- 增加遮罩層 -->
         <div v-if="menuOpen" class="mobile-menu">
-            <!-- <div v-if="menuOpen" :class="['mobile-menu', menuOpen ? 'mobile-menu-open' : '']"> -->
             <ul>
                 <li v-for="(link, index) in links" :key="link.path">
-                    <!-- <RouterLink :to="link.path" @click="toggleMenu">{{ link.name }}</RouterLink> -->
                     <a href="#" @click.prevent="toggleSubMenu(index)">
                         {{ link.name }}
                     </a>
@@ -150,13 +64,15 @@ export default {
                 </li>
             </ul>
         </div>
-
     </header>
 </template>
 
 <script>
 import { RouterLink } from 'vue-router';
 import { useCartStore } from '@/stores/cartStore';
+import { gapi } from 'gapi-script';
+import { useLoginStore } from '@/stores/loginStore'; // 添加這行
+
 export default {
     components: {
         RouterLink,
@@ -180,15 +96,26 @@ export default {
         },
         cartItemCount() {
             return this.cartStore.uniqueItemCount;
+        },
+        loginStore() { // 添加這段
+            return useLoginStore();
         }
     },
     methods: {
         signOut() {
-            this.$router.push('/');
-            const logInBtn = document.querySelector(".logIn-btn");
-            const member = document.querySelector(".member");
-            member.style.display = "none";
-            logInBtn.style.display = "block";
+            gapi.load('auth2', () => {
+                const auth2 = gapi.auth2.getAuthInstance();
+                auth2.signOut().then(() => {
+                    console.log('Google user signed out.');
+                    this.loginStore.isLoggedIn = false; // 更新 Pinia 狀態
+                    this.loginStore.currentUser = null; // 清除當前用戶信息
+                    this.$router.push('/');
+                    const logInBtn = document.querySelector(".logIn-btn");
+                    const member = document.querySelector(".member");
+                    member.style.display = "none";
+                    logInBtn.style.display = "block";
+                });
+            });
         },
         loginIn() {
             const loginBox = document.querySelector(".login-box");
@@ -198,12 +125,6 @@ export default {
         toggleMenu() {
             this.menuOpen = !this.menuOpen;
             this.activeSubMenu = null;
-            // const mobileMenu = document.querySelector('.mobile-menu');
-            // if (this.menuOpen) {
-            //     mobileMenu.classList.add('mobile-menu-open');
-            // } else {
-            //     mobileMenu.classList.remove('mobile-menu-open');
-            // }
         },
         toggleSubMenu(index) {
             if (this.activeSubMenu === index) {
@@ -212,9 +133,6 @@ export default {
                 this.activeSubMenu = index;
             }
         },
-        // toggleSubMenu(link) {
-        //     link.showSubMenu = !link.showSubMenu;
-        // },
         handleResize() {
             if (window.innerWidth > 996) {
                 this.menuOpen = false;
@@ -232,5 +150,5 @@ export default {
 </script>
 
 <style scoped>
-
+/* 加上您的樣式 */
 </style>

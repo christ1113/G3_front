@@ -196,6 +196,9 @@ header {
                         }
                     }
                 }
+                .sign-out {
+                    display: none;
+                }
             }
 
             @media (max-width: 996px) {
@@ -278,6 +281,11 @@ header {
             position: relative;
             font-family: 'Noto Serif HK', serif;
             display: none;
+
+            @media (max-width: 996px) {
+                color: #FFFFFF;
+            }
+
             ul {
                 width: 120%;
                 position: absolute;
@@ -290,9 +298,11 @@ header {
                 box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
                 z-index: 2;
                 display: none;
+
                 li {
                     font-family: 'Noto Serif HK', serif;
                     padding: 3px 0;
+                    color: #564A41;
                 }
             }
             &.member:hover>ul {
@@ -342,6 +352,9 @@ header {
                     }
 
                 }
+            }
+            .sign-out {
+                display: block;
             }
         }
 
