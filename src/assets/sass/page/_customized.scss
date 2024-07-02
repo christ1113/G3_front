@@ -33,6 +33,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        flex-direction: column;
         h1{
             display: inline-block;
             color: #B1241A;
@@ -41,6 +42,12 @@
             border-radius: 20px;
             transition: all 0.3s;
             cursor: pointer;
+            span{
+                font-size: 20px;
+                margin-top: 20px;
+                text-align: center;
+                display: block;
+            }
             &:hover{
                 color: white;
                 background-color: #B1241A;
@@ -256,6 +263,9 @@
                         z-index: 2;
                         .item{
                             width: 100%;
+                            padding: 10px;
+                            border-top-left-radius: 20px;
+                            border-bottom-left-radius: 20px;
                             cursor: pointer;
                             .icon{
                             width: 100%;
@@ -269,6 +279,9 @@
                             span{
                                 font-size: 16px;
                                 color: #ffffff;
+                            }
+                            &.selected {
+                                background-color: #94150C;
                             }
                         }
                     }
@@ -293,6 +306,8 @@
                                 height: 50px;
                                 border-radius: 5px;
                                 background-color: white;
+                                overflow: hidden;
+                                cursor: pointer;
                                 img{
                                     height: 100%;
                                 }
@@ -350,17 +365,17 @@
                     }
                 }
 
-                canvas{
-                    mask-image: url(/src/assets/pic/customized/Preview.png);
-                    mask-size: contain;
-                    mask-repeat: no-repeat;
-                    mask-position: center;
-                    mask-mode: alpha;
-                    -webkit-mask-image: url(/src/assets/pic/customized/Preview.png);
-                    -webkit-mask-size: contain;
-                    -webkit-mask-repeat: no-repeat;
-                    -webkit-mask-position: center;
-                }
+                // canvas{
+                //     mask-image: url(/src/assets/pic/customized/Preview.png);
+                //     mask-size: contain;
+                //     mask-repeat: no-repeat;
+                //     mask-position: center;
+                //     mask-mode: alpha;
+                //     -webkit-mask-image: url(/src/assets/pic/customized/Preview.png);
+                //     -webkit-mask-size: contain;
+                //     -webkit-mask-repeat: no-repeat;
+                //     -webkit-mask-position: center;
+                // }
 
                 .preview-item{
                     width: 25%;
@@ -602,6 +617,41 @@
                         }
                     }
 
+                }
+            }
+        }
+    }
+
+    .box{
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 50;
+        width: 30%;
+        background-color: white;
+        border: #94150C solid 2px;
+        border-radius: 20px;
+        padding: 40px 30px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-evenly;
+        h4{
+            color: #B1241A;
+            margin-bottom: 30px;
+        }
+        .btn-group{
+            
+            .btn{
+                font-size: 16px;
+                margin: 0 15px;
+                font-weight: 600;
+                font-family: "Noto Serif HK", serif;
+                border: 1.5px solid #B1241A;
+                &:hover{
+                    background-color: white;
+                    color: #B1241A;
                 }
             }
         }
