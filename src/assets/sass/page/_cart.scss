@@ -303,6 +303,21 @@
                 .price {
                     padding: 10px;
                 }
+
+                .checkout {
+
+                    .checkout-link {
+                        button {
+                            border-radius: 20px;
+                            width: 120px;
+                            height: 46px;
+                            cursor: pointer;
+                            color: #ffffff;
+                            font-size: 14px;
+
+                        }
+                    }
+                }
             }
         }
     }

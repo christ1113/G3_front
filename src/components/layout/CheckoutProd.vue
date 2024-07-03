@@ -38,6 +38,7 @@ export default {
 
 
 <style lang="scss" scoped>
+ @import "@/assets/sass/style";
 .card {
     display: flex;
     padding-left: 20px;
@@ -95,5 +96,127 @@ export default {
 
         }
     }
+}
+
+@media screen and (min-width: $md) and (max-width: $xl){
+  .card {
+    display: flex;
+    padding-left: 20px;
+    height: 30%;
+    border-bottom: 1px solid #ccc; // 添加這一行
+    &:last-child {
+        border-bottom: none; // 最後一個元素不需要邊框
+    }
+    
+    .prod-detail {
+        display: flex;
+        margin: 20px 0;
+
+        img {
+            height: auto;
+            width: 20%;
+            object-fit: cover;
+            border-radius: 10px;
+            margin: auto 10px auto 0;
+
+        }
+
+        .prod-spec {
+            display: flex;
+            margin: auto 0;
+            width: 80%;
+
+
+            .info {
+                width: 40%;
+
+                h5 {
+                    padding-bottom: 10px;
+                }
+
+                span {
+                    line-height: 150%;
+                    font-size: 14px;
+                }
+            }
+
+            .amount {
+                width: 30%;
+                display: flex;
+                margin: auto;
+                justify-content: center;
+            }
+
+            .price {
+                display: flex;
+                width: 30%;
+                margin: auto;
+                justify-content: center;
+            }
+
+        }
+    }
+}
+}
+@media screen and (max-width: $md){
+  .card {
+    display: flex;
+    padding-left: 20px;
+    height: 30%;
+    border-bottom: 1px solid #ccc; // 添加這一行
+    &:last-child {
+        border-bottom: none; // 最後一個元素不需要邊框
+    }
+    
+    .prod-detail {
+        display: flex;
+        margin: 20px 0;
+
+        img {
+            height: auto;
+            width: 20%;
+            object-fit: cover;
+            border-radius: 10px;
+            margin: auto 10px auto 0;
+
+        }
+
+        .prod-spec {
+            display: flex;
+            margin: auto 0;
+            width: 80%;
+
+
+            .info {
+                width: 40%;
+
+                h5 {
+                    padding-bottom: 10px;
+                    font-size: 14px;
+                }
+
+                span {
+                    line-height: 150%;
+                    font-size: 10px;
+                }
+            }
+
+            .amount {
+                width: 30%;
+                display: flex;
+                margin: auto;
+                justify-content: center;
+            }
+
+            .price {
+                display: flex;
+                width: 30%;
+                margin: auto;
+                justify-content: center;
+            }
+
+        }
+    }
+}
 }
 </style>

@@ -51,7 +51,7 @@
                     <label for="phone">收件人聯絡電話：</label>
                     <input type="text" id="phone">
                 </div>
-                <div class="form-group">
+                <div class="form-group" id="address-form">
                     <label for="address">收件人地址：</label>
                     <select v-model="selectedCity" @change="onCityChange" class="select">
                         <option disabled value="">請選擇縣市</option>
@@ -747,70 +747,10 @@ export default {
 
 @media screen and (min-width: $md) and (max-width: $xl) {
     .checkout-container {
-        width: 60%;
+        width: 80%;
         margin: 50px auto;
 
-        .confirm-info {
-            border: 1px solid #828282;
-            background: #ffffff;
-            border-radius: 20px;
-            height: 240px;
-
-            .confirm-title {
-                height: 48px;
-                padding-left: 20px;
-                display: flex;
-                align-items: center;
-
-                button {
-                    background-color: transparent;
-                    border: none;
-                }
-            }
-
-            .disc-line {
-                height: 1px;
-                background-color: #828282;
-            }
-
-            .ord-info {
-                height: 80%;
-                display: flex;
-                align-items: center;
-                padding-left: 20px;
-
-                form {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 25px;
-                    width: 100%;
-
-                    .form-group {
-                        display: flex;
-                        align-items: flex-start;
-                        margin: auto 0;
-
-                        label {
-                            flex-basis: 25%;
-                            margin: auto 0;
-                            font-size: 14px;
-                        }
-
-                        input {
-                            height: 20px;
-                            flex-basis: 25%;
-                        }
-                    }
-                }
-            }
-        }
-
         .confirm-ord {
-            border: 1px solid #828282;
-            background: #ffffff;
-            border-radius: 20px;
-            margin: 40px 0;
-            height: 945px;
 
             .confirm-ord-title {
                 height: 48px; //高的問題要解決
@@ -825,20 +765,15 @@ export default {
             }
 
             .prod-info {
-                display: flex;
-                padding-left: 20px;
+                display: block;
+                padding-left: 0px;
                 height: 30%;
-
-                button {
-                    background-color: transparent;
-                    border: none;
-                }
 
                 .prod-img {
                     height: auto;
                     width: 20%;
                     object-fit: cover;
-                    border-radius: 20px;
+                    border-radius: 10px;
                     margin: auto 10px auto 0;
 
                 }
@@ -852,6 +787,7 @@ export default {
                     .prod-card {
                         h5 {
                             padding-bottom: 10px;
+                            font-size: 16px;
                         }
 
                         span {
@@ -910,7 +846,6 @@ export default {
                 flex-direction: column;
                 margin-top: 40px;
                 gap: 25px;
-                width: 100%;
                 padding-left: 20px;
 
                 .form-group {
@@ -979,7 +914,6 @@ export default {
                 flex-direction: column;
                 margin-top: 40px;
                 gap: 25px;
-                width: 100%;
                 padding-left: 20px;
 
                 .form-group {
@@ -1159,35 +1093,58 @@ export default {
             border: 1px solid #828282;
             background: #ffffff;
             border-radius: 20px;
-            height: 240px;
             margin: 40px 0;
 
             .invoice-item {
-                margin: auto 10px;
-                display: flex;
-                justify-content: space-around;
-                align-items: center;
-                padding: 50px 0;
+                margin: auto;
+                padding: 30px 0 10px 0;
 
-
-                .item-description,
-                .item-discount,
-                .item-multiplier {
+                .item-description {
                     text-align: center;
+                    display: flex;
+                    justify-content: center;
+                    margin-bottom: 20px;
+
+                    p {
+                        margin: 5px 0;
+                    }
+
+                    .item-total {
+                        margin: 0 10px;
+                        width: 33.33%;
+                    }
+
+                    .useCoupon {
+                        display: flex;
+                        justify-content: space-around;
+                        width: 66.66%;
+                        margin: auto;
+
+                        .item-multiplication {
+                            margin: 0 10px;
+                            width: 50%;
+                        }
+
+                        .item-discount {
+                            margin: 0 10px;
+                            width: 50%;
+                        }
+                    }
+
+
                 }
 
-                .item-description p,
-                .item-discount p,
-                .item-multiplier p {
-                    margin: 5px 0;
+
+
+
+                .disc-line {
+                    height: 1px;
+                    background-color: #828282;
                 }
 
             }
 
-            .disc-line {
-                height: 1px;
-                background-color: #828282;
-            }
+
 
             .invoice-total {
                 margin: auto 40px;
@@ -1199,10 +1156,6 @@ export default {
         }
 
         .confirm-checkout {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 80px 0;
 
             button {
                 background-color: transparent;
@@ -1224,16 +1177,27 @@ export default {
 }
 
 @media screen and (max-width: $md) {
+    .go-back {
+        font-size: 14px;
+    }
+
     .checkout-container {
-        width: 90%;
+        width: 80%;
+        margin: 50px auto;
 
         .confirm-info {
-            border-radius: 10px;
+            border: 1px solid #828282;
+            background: #ffffff;
+            border-radius: 20px;
             height: 240px;
 
             .confirm-title {
                 height: 48px;
-                font-size: 15px;
+                padding-left: 20px;
+                display: flex;
+                align-items: center;
+                font-size: 14px;
+
             }
 
             .ord-info {
@@ -1254,7 +1218,7 @@ export default {
                         margin: auto 0;
 
                         label {
-                            flex-basis: 25%;
+                            flex-basis: 40%;
                             margin: auto 0;
                             font-size: 14px;
                         }
@@ -1269,75 +1233,17 @@ export default {
         }
 
         .confirm-ord {
-            border-radius: 10px;
-            height: 945px;
+            border: 1px solid #828282;
+            background: #ffffff;
+            border-radius: 20px;
+            margin: 40px 0;
 
             .confirm-ord-title {
-                height: 48px; //高的問題要解決
-                font-size: 15px;
-            }
-
-            .prod-info {
-                display: flex;
-                padding-left: 20px;
-                height: 30%;
-
-                button {
-                    background-color: transparent;
-                    border: none;
-                }
-
-                .prod-img {
-                    height: auto;
-                    width: 30%;
-                    object-fit: contain;
-                    border-radius: 10px;
-                    margin: auto 10px auto 0;
-
-                }
-
-                .prod-spec {
-                    display: flex;
-                    margin: auto 0;
-                    width: 70%;
-                    justify-content: space-between;
-                    flex-wrap: wrap;
-
-                    .prod-card {
-                        h5 {
-                            padding-bottom: 10px;
-                            font-size: 14px;
-                            flex-shrink: 1;
-                        }
-
-                        span {
-                            line-height: 150%;
-                            font-size: 14px;
-                        }
-
-                        .mention {
-                            font-size: 12px;
-                            padding-top: 50px;
-                        }
-
-                    }
-
-                    .prod-count {
-                        margin: auto;
-                    }
-
-                    .prod-sum {
-                        margin: auto;
-                    }
-
-                }
+                font-size: 14px;
             }
 
             .receiver-info {
-                display: flex;
-                margin: 20px 0;
-                padding-left: 30px;
-                align-items: center;
+                font-size: 14px;
 
                 .receiver {
                     position: relative;
@@ -1346,7 +1252,7 @@ export default {
                     &::before {
                         content: "";
                         position: absolute;
-                        height: 18px;
+                        height: 16px;
                         width: 2px;
                         background-color: rgba(190, 26, 14, 1);
                         left: -10px;
@@ -1366,36 +1272,41 @@ export default {
                 flex-direction: column;
                 margin-top: 40px;
                 gap: 25px;
-                width: 100%;
                 padding-left: 20px;
+                font-size: 14px;
+
+                #address-form {
+                    select {
+                        height: 26px;
+                        flex-basis: auto;
+                        margin-right: 10px;
+                        background-color: rgba(249, 241, 229, 1);
+                        margin: 0 10px 10px 0;
+                    }
+                }
 
                 .form-group {
                     display: flex;
                     align-items: flex-start;
                     margin: auto 0;
+                    flex-wrap: wrap;
 
                     label {
-                        flex-basis: 25%;
+                        flex-basis: 40%;
                         margin: auto 0;
                         font-size: 14px;
+
                     }
 
                     input {
                         height: 20px;
-                        flex-basis: 25%;
-                        font-size: 14px;
+                        flex-basis: 20%;
                     }
 
-                    select {
-                        height: 26px;
-                        flex-basis: 10%;
-                        margin-right: 10px;
-                        background-color: rgba(249, 241, 229, 1);
-                    }
 
                     .large-textarea {
                         height: 80px;
-                        flex-basis: 25%;
+                        flex-basis: 50%;
                         resize: vertical;
                         /* 允許垂直調整大小 */
 
@@ -1406,22 +1317,17 @@ export default {
 
             }
 
-            .disc-line-form {
-                margin-top: 20px;
-                height: 1px;
-                background-color: #828282;
-            }
-
             .invoicing-title {
                 display: flex;
                 margin: 20px 0;
                 padding-left: 30px;
                 position: relative;
+                font-size: 14px;
 
                 &::before {
                     content: "";
                     position: absolute;
-                    height: 18px;
+                    height: 16px;
                     width: 2px;
                     background-color: rgba(190, 26, 14, 1);
                     left: 20px;
@@ -1433,9 +1339,8 @@ export default {
             .invoicing-form {
                 display: flex;
                 flex-direction: column;
-                margin-top: 40px;
+                margin: 40px 0 20px 0;
                 gap: 25px;
-                width: 100%;
                 padding-left: 20px;
 
                 .form-group {
@@ -1444,28 +1349,28 @@ export default {
                     margin: auto 0;
 
                     label {
-                        flex-basis: 25%;
+                        flex-basis: 40%;
                         margin: auto 0;
                         font-size: 14px;
+
                     }
 
                     input {
                         height: 20px;
-                        flex-basis: 0;
-
+                        flex-basis: 20%;
                     }
 
                     .invoicing-cb {
-                        width: 13px;
-                        height: 13px;
-                        margin: auto 10px auto 30px;
+                        margin: 10px 0;
+                        flex-basis: 20%;
+
                     }
 
                     span {
-                        display: inline-block;
+                        display: flex;
                         margin: auto 0;
-                        font-size: 14px;
                     }
+
                 }
             }
 
@@ -1476,6 +1381,7 @@ export default {
             background: #ffffff;
             border-radius: 20px;
             height: 290px;
+            font-size: 14px;
 
             .payment-title {
                 height: 48px;
@@ -1484,16 +1390,12 @@ export default {
                 align-items: center;
             }
 
-            .disc-line {
-                height: 1px;
-                background-color: #828282;
-            }
-
             .payment-info {
                 height: 82%;
                 display: flex;
                 align-items: center;
                 padding-left: 20px;
+                padding-right: 20px;
 
                 form {
                     display: flex;
@@ -1507,13 +1409,9 @@ export default {
                         align-items: flex-start;
                         margin: auto 0;
 
-                        input[type="radio"] {
-                            margin-right: 10px;
-                            accent-color: #be1a0e;
-                        }
 
                         label {
-                            flex-basis: 25%;
+                            flex-basis: 40%;
                             margin: auto 0;
                             font-size: 14px;
                         }
@@ -1535,6 +1433,11 @@ export default {
                             font-size: 14px;
                         }
 
+                        input::placeholder {
+                            font-size: 12px;
+                            /* 調整為你需要的字體大小 */
+                        }
+
                         #expiry-date-mm {
                             display: flex;
                             width: 30px;
@@ -1551,7 +1454,7 @@ export default {
                         #cvc {
                             margin-left: 14px;
                             width: 50px;
-                            flex-basis: 20%;
+                            flex-basis: 35%;
 
                         }
 
@@ -1615,60 +1518,74 @@ export default {
             border: 1px solid #828282;
             background: #ffffff;
             border-radius: 20px;
-            height: 240px;
             margin: 40px 0;
 
             .invoice-item {
-                margin: auto 10px;
-                display: flex;
-                justify-content: space-around;
-                align-items: center;
-                padding: 50px 0;
+                margin: auto;
+                padding: 30px 0 10px 0;
 
-
-                .item-description,
-                .item-discount,
-                .item-multiplier {
+                .item-description {
                     text-align: center;
-                }
+                    display: flex;
+                    justify-content: center;
+                    margin-bottom: 20px;
 
-                .item-description p,
-                .item-discount p,
-                .item-multiplier p {
-                    margin: 5px 0;
+                    p {
+                        margin: 5px 0;
+                        font-size: 14px;
+                    }
+
+                    .item-total {
+                        margin: 0 10px;
+                        width: 33.33%;
+
+                    }
+
+                    .useCoupon {
+                        display: flex;
+                        justify-content: space-around;
+                        width: 66.66%;
+                        margin: auto;
+
+                        .item-multiplication {
+                            margin: 0 10px;
+                            width: 50%;
+                        }
+
+                        .item-discount {
+                            margin: 0 10px;
+                            width: 50%;
+                        }
+                    }
+
+
                 }
 
             }
 
-            .disc-line {
-                height: 1px;
-                background-color: #828282;
-            }
+
 
             .invoice-total {
                 margin: auto 40px;
                 text-align: right;
                 padding: 20px 0;
                 font-weight: 600;
+                font-size: 14px;
             }
 
         }
 
         .confirm-checkout {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 80px 0;
 
             button {
                 background-color: transparent;
                 border: none;
                 background: #be1a0e;
                 border-radius: 20px;
-                width: 130px;
-                height: 50px;
+                width: 120px;
+                height: 46px;
                 color: #ffffff;
-                font-size: 16px;
+                font-size: 14px;
                 cursor: pointer;
             }
         }
