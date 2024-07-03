@@ -1,30 +1,30 @@
 <template>
     <div v-if="item" class="card-single">
-        <router-link :to="`/product/${item.id}`">
+        <router-link :to="`/product/${item.prod_id}`">
             <div class="card-pic">
-            <img v-if="item.pic1" :src="parseIcon(item.pic1)" :alt="item.name">
+            <img v-if="item.prod_img1" :src="parseIcon(item.prod_img1)" :alt="item.prod_name">
             <img v-else src="" alt="">
             <div class="card-fav">
-                <div class="card-fav-icon" @click.prevent="toogleFav(item.id)" >
-                    <i v-if="item.fav" class="fa-solid fa-heart"></i>
-                    <i v-else class="fa-regular fa-heart"></i>
+                <div class="card-fav-icon" @click.prevent="toogleFav(item.prod_id)" >
+                    <!-- <i v-if="item.fav" class="fa-solid fa-heart"></i>
+                    <i v-else class="fa-regular fa-heart"></i> -->
                 </div>
             </div>
         </div>
         <div class="card-txt">
             <div class="card-tag">
-                <span>{{ item.tag || '' }}</span>
+                <span>{{ item.prod_category || '' }}</span>
             </div>
             <div class="card-title">
-                {{ item.name || '' }}
+                {{ item.prod_name || '' }}
             </div>
             <div class="card-rating">
-                <span v-for="star in Math.floor(item.rating)" :key="star">
+                <span v-for="star in Math.floor(item.prod_rating)" :key="star">
                     🌟
                 </span>
             </div>
             <div class="card-price">
-                NT${{ item.price || '' }}
+                NT${{ item.prod_price || '' }}
             </div>
 
         </div>

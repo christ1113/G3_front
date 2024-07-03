@@ -48,7 +48,7 @@
                 <div v-if="responseData.length === 0">loading...</div>
                 <div v-else-if="displayData.length === 0">nodata...</div>
                 <div v-else class="display-window">
-                    <ProductCard class="product-card" v-for="item in displayData" :key="item.id" :item="item" />
+                    <ProductCard class="product-card" v-for="item in displayData" :key="item.prod_id" :item="item" />
                 </div>
             </div>
         </div>
@@ -71,16 +71,31 @@ export default {
     //可以用create也可以用mounted
     // created() {
     mounted() {
-        fetch(`${import.meta.env.BASE_URL}products.json`)
-            .then(res => res.json())
+        const body = {
+            // 确保 body 定义并包含正确的数据
+        };
+
+        fetch(`http://localhost/g3_php/product.php`, {
+            method: "POST",
+            body: JSON.stringify(body)
+        })
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error('Network response was not ok ' + res.statusText);
+                }
+                return res.json();
+            })
             .then(json => {
                 // 確認有沒有response
                 console.log(json);
                 // 備份還原用
-                this.responseData = json
+                this.responseData = json["data"]["list"];
                 // 顯示用
-                this.displayData = json
+                this.displayData = json["data"]["list"];
             })
+            .catch(error => {
+                console.error('There has been a problem with your fetch operation:', error);
+            });
     },
     methods: {
         clear() {
@@ -92,14 +107,14 @@ export default {
             if (selectedTag === 'default') {
                 this.displayData = [...this.responseData];
             } else {
-                this.displayData = this.responseData.filter(item => item.tag === selectedTag);
+                this.displayData = this.responseData.filter(item => item.prod_category === selectedTag);
             }
         },
         filterData() {
             console.log(this.search)
             this.displayData = this.responseData.filter((item) => {
                 // return item.name == this.search
-                return item.name.includes(this.search)
+                return item.prod_name.includes(this.search)
             })
         },
         clear() {
@@ -109,9 +124,9 @@ export default {
         sortData(event) {
             const sortType = event.target.value;
             if (sortType === 'highToLow') {
-                this.displayData.sort((a, b) => b.price - a.price);
+                this.displayData.sort((a, b) => b.prod_price - a.prod_price);
             } else if (sortType === 'lowToHigh') {
-                this.displayData.sort((a, b) => a.price - b.price);
+                this.displayData.sort((a, b) => a.prod_price - b.prod_price);
             } else {
                 this.displayData = [...this.responseData];
             }

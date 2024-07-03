@@ -9,7 +9,9 @@
         
         <!-- 客製化開始 -->
         <div class="container-customized-start" v-show="currentStep === 1">
-                <h1 @click="currentStep++">打造專屬自我風格</h1>
+            <h1 @click="currentStep++">打造專屬自我風格
+                <span>( 點擊立即開始 )</span>
+            </h1>
         </div>
         
         <!-- 客製化 step 1 -->
@@ -30,11 +32,11 @@
                     class="pic"
                     @click="selectPic(index)"
                     >
-                    <img :src="parseIcon(pic.img)" />
-                    <h4>{{ pic.title }}</h4>
+                        <img :src="parseIcon(pic.img)" />
+                        <h4>{{ pic.title }}</h4>
                     </div>
                 </div>
-                <div class="next-arrow" @click="currentStep++">
+                <div class="next-arrow" @click="nextStep">
                     <svg width="11" height="19" viewBox="0 0 11 19" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M0.897949 0.816406L10.0816 10.0001L1.91836 18.1633" stroke="#B1241A" stroke-linecap="round"/>
                     </svg>
@@ -53,22 +55,23 @@
                     </div>
                     <h3>設計出你的獨特傘面</h3>
                 </div>
+                <!-- 圖片清單列 -->
                 <div class="design-group">
                     <div class="customized-list">
                         <div class="item-list">
-                            <div class="item"  @click="showGroup('upload')">
+                            <div class="item"  @click="showGroup('upload')" :class="{'selected': currentGroup === 'upload'}">
                                 <div class="icon">
                                     <img src="/src/assets/pic/customized/customized-img.png" alt="">
                                 </div>
                                 <span>上傳圖片</span>
                             </div>
-                            <div class="item"  @click="showGroup('template')">
+                            <div class="item"  @click="showGroup('template')" :class="{'selected': currentGroup === 'template'}">
                                 <div class="icon">
                                     <img src="/src/assets/pic/customized/customized-template.png" alt="">
                                 </div>
                                 <span>範本</span>
                             </div>
-                            <div class="item"  @click="showGroup('icon')">
+                            <div class="item"  @click="showGroup('icon')" :class="{'selected': currentGroup === 'icon'}">
                                 <div class="icon">
                                     <img src="/src/assets/pic/customized/customized-i-con.png" alt="">
                                 </div>
@@ -92,9 +95,13 @@
                                 <div class="pic" v-for="(pic, index) in getImageList(currentGroup)" :key="index" @click="selectImage(pic)">
                                     <img :src="pic" :alt="'pic' + index">
                                 </div>
+                                <div class="upload" v-if="currentGroup === 'upload'">
+                                    <input type="file" @change="handleFileUpload">
+                                </div>
                             </div>
                         </div>
                     </div>
+                    <!-- 設計區域 -->
                     <div class="design-back">
                         <div class="design">
                             <div class="design-canvas" ref="designCanvas" @click="deselectAll">
@@ -122,6 +129,7 @@
                     </div>
                     <!-- 隱藏畫布區域 -->
                     <canvas ref="hiddenCanvas" style="display: none;"></canvas>
+                    <!-- 預覽區域 -->
                     <div class="preview-item">
                         <div class="preview">
                             <h5>效果預覽</h5>
@@ -138,7 +146,7 @@
                                 <path d="M0.897949 0.816406L10.0816 10.0001L1.91836 18.1633" stroke="#B1241A" stroke-linecap="round"/>
                                 </svg>
                             </div>
-                            <div class="next-arrow" @click="currentStep++">
+                            <div class="next-arrow" @click="showBox2 = true">
                                 <svg width="11" height="19" viewBox="0 0 11 19" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M0.897949 0.816406L10.0816 10.0001L1.91836 18.1633" stroke="#B1241A" stroke-linecap="round"/>
                                 </svg>
@@ -202,11 +210,27 @@
             </div>
         </div>
         
+        <div class="box" v-if="showBox" >
+            <h4>親，尚未選擇傘面</h4>
+            <div class="btn-group">
+                <button class="btn" @click="confirm">確定</button>
+            </div>
+        </div>
+
+        <div class="box" v-if="showBox2" >
+            <h4>親，確定後就不能再修改嘍 ~</h4>
+            <div class="btn-group">
+                <button class="btn" @click="confirm">繼續設計</button>
+                <button class="btn" @click="finalDesign">我完成了</button>
+            </div>
+        </div>
 
     </section>
 </template>
 
 <script>
+    import { useCustomizedStore } from '../stores/customized.js'
+
     export default{
         data() {
             return {
@@ -226,8 +250,11 @@
                         title: '宣紙' }
                     ],
                 selectedIndex : null,
+                showBox: false,
 
                 // step 2
+
+                showBox2: false,
                 designItems: [], // 存放圖案位置 { src, top, left, scale, zIndex }
                 selectedImage: null,
                 currentGroup: null,
@@ -242,8 +269,8 @@
                 initialScale: 1,
                 picArrays: {
                     upload: [
-                        '/src/assets/pic/customized/Icon-1.png',
-                        '/src/assets/pic/customized/Icon-1.png'
+                        // '/src/assets/pic/customized/Icon-1.png',
+                        // '/src/assets/pic/customized/Icon-1.png'
                     ],
                     template: [
                         '/src/assets/pic/customized/icon-2.png',
@@ -253,6 +280,12 @@
                         '/src/assets/pic/customized/icon-1.png',
                         '/src/assets/pic/customized/icon-2.png',
                         '/src/assets/pic/customized/icon-3.png',
+                        '/src/assets/pic/customized/icon-4.png',
+                        '/src/assets/pic/customized/icon-5.png',
+                        '/src/assets/pic/customized/icon-6.png',
+                        '/src/assets/pic/customized/icon-7.png',
+                        '/src/assets/pic/customized/icon-8.png',
+                        '/src/assets/pic/customized/icon-9.png',
                     ],
                 },
 
@@ -288,12 +321,47 @@
                 this.selectedIndex = index;
             },
 
-            // step 2
-            showGroup(group) {
-                this.currentGroup = group;
+            // 下一步的判斷
+            nextStep() {
+                if (this.selectedIndex === null ) {
+                    this.showBox = true;
+                } else {
+                    this.currentStep++;
+                    this.showBox = false;
+                }
             },
+            // 點擊按鈕後關閉box
+            confirm() {
+                this.showBox = false;
+                this.showBox2 = false;
+            },
+
+            // step 2
+            finalDesign(){
+                this.currentStep++ ;
+                this.showBox2 = false;
+            },
+
+            showGroup(group) {
+                if (this.currentGroup === group) {
+                this.currentGroup = null;
+                } else {
+                this.currentGroup = group;
+                }
+            },
+
             getImageList(group) {
                 return this.picArrays[group] || [];
+            },
+            handleFileUpload(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        this.picArrays.upload.push(e.target.result);
+                    };
+                    reader.readAsDataURL(file);
+                }
             },
 
             selectImage(image) {
@@ -349,32 +417,58 @@
 
                 // 當所有設計元素都繪製完成後，進行最終的混合
                 Promise.all(drawPromises).then(() => {
+                    // 在 finalCanvas 上填充白色背景
+                    finalCtx.fillStyle = 'white';
+                    finalCtx.fillRect(0, 0, canvas.width, canvas.height);
+
                     // 加載背景圖
                     const backgroundImage = new Image();
                     backgroundImage.onload = () => {
                         // 在 finalCanvas 上繪製背景
                         finalCtx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
 
-                        // 設置混合模式為 multiply 並繪製設計層
-                        finalCtx.globalCompositeOperation = 'normal';
+                        // 繪製設計層
                         finalCtx.drawImage(designLayer, 0, 0);
 
-                        // 重置混合模式
-                        finalCtx.globalCompositeOperation = 'source-over';
+                        // 創建一個新的canvas來應用遮色片
+                        const maskCanvas = document.createElement('canvas');
+                        maskCanvas.width = canvas.width;
+                        maskCanvas.height = canvas.height;
+                        const maskCtx = maskCanvas.getContext('2d');
 
-                        // 更新預覽圖
-                        this.selectedImage = finalCanvas.toDataURL();
+                        // 加載並繪製遮色片
+                        const clipImage = new Image();
+                        clipImage.onload = () => {
+                            // 在 maskCanvas 上繪製遮色片
+                            maskCtx.drawImage(clipImage, 0, 0, canvas.width, canvas.height);
 
-                        // 將 finalCanvas 轉換為圖片 URL
-                        const imageURL = finalCanvas.toDataURL("image/png");
-                        console.log(imageURL);
+                            // 應用遮色片到 finalCanvas
+                            finalCtx.globalCompositeOperation = 'destination-in';
+                            finalCtx.drawImage(maskCanvas, 0, 0);
 
+                            // 重置混合模式
+                            finalCtx.globalCompositeOperation = 'source-over';
+
+                            // 更新預覽圖
+                            this.selectedImage = finalCanvas.toDataURL();
+                        };
+
+                        // 將 finalCanvas 轉換為 Blob
+                        finalCanvas.toBlob(blob => {
+                            // 傳遞 blob 到空物件
+                            this.imageBlob = blob;
+
+                            // 如果你需要 base64 格式的圖片, 也可以保留這部分
+                            this.selectedImage = URL.createObjectURL(blob);
+                        });
                         // 需處理 formData的問題，imageURL BASE字元太多
 
+                        clipImage.src = '/src/assets/pic/customized/Preview.png'; // 請替換為實際的遮色片圖路徑
                     };
                     backgroundImage.src = '/src/assets/pic/customized/Preview.png'; // 請替換為實際的背景圖路徑
                 });
             },
+
 
             selectItem(index, e) {
                 e.preventDefault(); // 阻止默認行為
@@ -446,24 +540,6 @@
                 this.designItems.splice(index, 1);
                 // 移除預覽圖案
                 this.selectedImage = null; 
-            },
-
-
-            showGroup(group) {
-                if (this.currentGroup === group) {
-                this.currentGroup = null;
-                } else {
-                this.currentGroup = group;
-                }
-            },
-            handleOutsideClick(e) {
-                // 判斷點擊事件是否發生在 .customized-list 
-                if (!this.$el.contains(e.target)) {
-                    this.currentGroup = null;
-                }
-            },
-            getImageList(group) {
-                return this.picArrays[group] || [];
             },
 
             // step3 ----
