@@ -114,7 +114,7 @@ export default {
 
         const googleLogIn = () => {
             if (loginStore.googleSignIn()) {
-                alert("登入成功!");
+                // alert("登入成功!");
                 closeLoginBox();
                 router.push('/memberinfo'); // 使用 router.push 方法进行路由跳转
                 document.querySelector(".member").style.display = "block";
@@ -155,7 +155,7 @@ export default {
                 });
             });
             if (loginStore.googleSignIn()) {
-                alert("登入成功!");
+                // alert("登入成功!");
                 closeLoginBox();
                 router.push('/memberinfo'); // 使用 router.push 方法进行路由跳转
                 document.querySelector(".member").style.display = "block";

@@ -19,7 +19,7 @@
                             </li>
                         </ul>
                     </li>
-                    <li class="sign-out" @click="signOut">登出</li>
+                    
                 </ul>
             </nav>
             <div class="icons">
@@ -63,6 +63,7 @@
                         </li>
                     </ul>
                 </li>
+                <li class="sign-out" @click="signOut">登出</li>
             </ul>
         </div>
     </header>
@@ -115,6 +116,7 @@ export default {
                     const member = document.querySelector(".member");
                     member.style.display = "none";
                     logInBtn.style.display = "block";
+                    this.menuOpen = false; // 隱藏 mobile-menu
                 });
             });
         },
