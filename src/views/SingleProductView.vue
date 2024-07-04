@@ -78,7 +78,7 @@
             <div v-if="responseData.length === 0">loading...</div>
             <div v-else-if="displayData.length === 0">nodata...</div>
             <div v-else class="display-window">
-                <ProductCard class="product-card" v-for="item in displayData" :key="item.id" :item="item" />
+                <ProductCard class="product-card" v-for="item in displayData" :key="item.prod_id" :item="item" />
             </div>
         </div>
     </div>
@@ -113,16 +113,31 @@ export default {
     },
     mounted() {
         this.fetchInfo();
-        fetch(`${import.meta.env.BASE_URL}products.json`)
-            .then(res => res.json())
+        const body = {
+            // 确保 body 定义并包含正确的数据
+        };
+
+        fetch(`http://localhost/g3_php/otherproduct.php`, {
+            method: "POST",
+            body: JSON.stringify(body)
+        })
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error('Network response was not ok ' + res.statusText);
+                }
+                return res.json();
+            })
             .then(json => {
                 // 確認有沒有response
                 console.log(json);
                 // 備份還原用
-                this.responseData = json
+                this.responseData = json["data"]["list"];
                 // 顯示用
-                this.displayData = json
+                this.displayData = json["data"]["list"];
             })
+            .catch(error => {
+                console.error('There has been a problem with your fetch operation:', error);
+            });
     },
     methods: {
         fetchInfo() {
