@@ -1,6 +1,6 @@
 <template>
-    <div class="go-back">
-        <router-link to="/activity/:id">
+    <div class="go-back" v-if="activity">
+        <router-link :to="`/activity/${activity.id}`">
             <返回活動詳情頁 </router-link>
     </div>
     <div class="checkout-container">
@@ -34,23 +34,8 @@
             </div>
             <div class="disc-line"></div>
 
-            <div class="act-info">
-                <!-- <button><i class="fa-solid fa-chevron-down"></i></button> -->
-                <img class="act-img" src="../assets/pic/act-teaching1.jpg" alt="教學活動1">
-                <div class="act-detail">
-                    <div class="act-location">
-                        <h5>油紙傘手工教室</h5>
-                        <span>地點：傘韻手工教室204</span><br>
-                        <span>活動時間：2024.05.20(一) 17:00~19:00</span><br>
-                        <div class="mention">*只需填寫一位參與者資料作為代表即可</div>
-                    </div>
-                    <div class="act-people">
-                        人數：<span>1/人</span>
-                    </div>
-                    <div class="act-amount">
-                        總計：NT$<span>300</span>
-                    </div>
-                </div>
+            <div class="act-info" v-if="activity">
+                <CheckoutAct :item="activity" />
             </div>
             <div class="disc-line"></div>
             <div class="join-info">
@@ -115,46 +100,125 @@
                     </div>
                     <div class="form-group">
                         <label for="use-coupon">是否使用優惠券：</label>
-                        <input type="checkbox" id="use-coupon" class="switch">
+                        <input type="checkbox" id="use-coupon" class="switch" v-model="useCoupon">
+                        <!-- <span class="switch-alert">*無可使用之優惠券</span> -->
                     </div>
                 </form>
             </div>
         </div>
-        <div class="invoice">
+        <div class="invoice" >
             <div class="invoice-item">
                 <div class="item-description">
-                    <p>油紙傘手工教室</p>
-                    <p>人數：1人</p>
-                    <p>NT$300(元)</p>
+                    <p>{{ activity.title }}</p>
+                    <p>人數：{{ activitycheckout.participantCount }}人</p>
+                    <p>NT${{ activitycheckout.totalAmount }}(元)</p>
                 </div>
-                <div class="item-multiplier">
-                    <p>x</p>
-                </div>
-                <div class="item-discount">
-                    <p>優惠折扣(8折)</p>
-                    <p>優惠券號碼：CID101</p>
-                    <p>80%</p>
-                </div>
+                <div v-if="useCoupon" class="useCoupon">
+                        <div class="item-multiplication">
+                            x
+                        </div>
+                        <div class="item-discount">
+                            <p>優惠折扣(8折)</p>
+                        </div>
+                    </div>
 
             </div>
             <div class="disc-line"></div>
             <div class="invoice-total">
-                <p>總計：NT$240</p>
+                <p>總計：NT${{ useCoupon ? discountedTotal : totalPrice }}</p>
             </div>
         </div>
         <div class="confirm-checkout">
-            <button>確認結帳</button>
+            <button @click="submitOrder">確認結帳</button>
         </div>
+        <SuccessModal :visible="showSuccessModal" message="結帳成功！" @close="closeModal" />
     </div>
+    
 </template>
+
+
 <script>
+import { useActivityStore } from '../stores/activitycheckout.js';
+import CheckoutAct from '../components/layout/CheckoutAct.vue';
+
+import SuccessModal from '../components/layout/SuccessModal.vue';
+
 export default {
+    components: { CheckoutAct, SuccessModal },
+
     data() {
+        return {
+            id: null,
+            useCoupon: false,
+            showSuccessModal: false,
+            activities: [],
+            activityId: null,
+            activitycheckout: null, // 假设这是你的活动信息存储对象
+            order: {
+                name: '',
+                phone: '',
+                email: '',
+                receiverName: '',
+                receiverPhone: '',
+                receiverEmail: '',
+                invoiceNumber: '',
+            }
+        };
     },
-    mounted() { },
+    computed: {
+        totalPrice() {
+            return this.activitycheckout.totalAmount;
+        },
+        discountedTotal() {
+            return Math.round(this.totalPrice * 0.8);
+        },
+        activity() {
+            return this.activities.find(activity => activity.id === this.activityId);
+        },
+    },
     methods: {
+        submitOrder() {
+            // 表单驗證
+            // if (!this.order.name || !this.order.phone || !this.order.email || !this.order.receiverName || !this.order.receiverPhone || !this.order.receiverEmail || !this.addressDetail) {
+            //     alert('請填寫並確認完成所有訂單資料');
+            //     return;
+            // }
+
+            // 顯示成功彈窗
+            this.showSuccessModal = true;
+
+            // 清空購物車
+            this.activitycheckout.cleanCart();
+        },
+        closeModal() {
+            this.showSuccessModal = false;
+            // 重定向到首頁
+            this.$router.push('/');
+        },
+        moveToNext(event, nextFieldId) {
+            if (event.target.value.length === event.target.maxLength) {
+                setTimeout(() => {
+                    this.$refs[nextFieldId].focus();
+                }, 100);
+            }
+        },
+        async fetchActivities() {
+            try {
+                const response = await fetch('/activities.json');
+                this.activities = await response.json();
+
+                // 假设从路由参数中获取 id
+                this.activityId = +this.$route.query.id;
+            } catch (error) {
+                console.error('Error fetching activities:', error);
+            }
+        },
+    },
+    created() {
+        this.activitycheckout = useActivityStore(); // 使用活动存储对象
+        this.fetchActivities(); // 加载活动数据
     }
-}
+};
 </script>
 <style scoped lang="scss">
 .go-back {
@@ -240,58 +304,58 @@ export default {
             background-color: #828282;
         }
 
-        .act-info {
-            display: flex;
-            padding-left: 20px;
-            height: 30%;
+        // .act-info {
+        //     display: flex;
+        //     padding-left: 20px;
+        //     height: 30%;
 
-            button {
-                background-color: transparent;
-                border: none;
-            }
+        //     button {
+        //         background-color: transparent;
+        //         border: none;
+        //     }
 
-            .act-img {
-                height: 80%;
-                width: 20%;
-                object-fit: cover;
-                border-radius: 20px;
-                margin: auto 10px;
+        //     .act-img {
+        //         height: 80%;
+        //         width: 20%;
+        //         object-fit: cover;
+        //         border-radius: 20px;
+        //         margin: auto 10px;
 
-            }
+        //     }
 
-            .act-detail {
-                display: flex;
-                margin: auto 0;
-                width: 80%;
-                justify-content: space-between;
+        //     .act-detail {
+        //         display: flex;
+        //         margin: auto 0;
+        //         width: 80%;
+        //         justify-content: space-between;
 
-                .act-location {
-                    h5 {
-                        padding-bottom: 10px;
-                    }
+        //         .act-location {
+        //             h5 {
+        //                 padding-bottom: 10px;
+        //             }
 
-                    span {
-                        line-height: 150%;
-                        font-size: 14px;
-                    }
+        //             span {
+        //                 line-height: 150%;
+        //                 font-size: 14px;
+        //             }
 
-                    .mention {
-                        font-size: 12px;
-                        padding-top: 20px;
-                    }
+        //             .mention {
+        //                 font-size: 12px;
+        //                 padding-top: 20px;
+        //             }
 
-                }
+        //         }
 
-                .act-people {
-                    margin: auto;
-                }
+        //         .act-people {
+        //             margin: auto;
+        //         }
 
-                .act-amount {
-                    margin: auto;
-                }
+        //         .act-amount {
+        //             margin: auto;
+        //         }
 
-            }
-        }
+        //     }
+        // }
 
         .join-info {
             display: flex;
@@ -342,6 +406,7 @@ export default {
                     height: 20px;
                     flex-basis: 25%;
                 }
+
                 .large-textarea {
                     height: 80px;
                     flex-basis: 25%;
@@ -499,17 +564,15 @@ export default {
             align-items: center;
             padding: 50px 0;
 
+            .item-description{
+                text-align:left;
 
-            .item-description,
-            .item-discount,
-            .item-multiplier {
-                text-align: center;
             }
 
-            .item-description p,
-            .item-discount p,
-            .item-multiplier p {
-                margin: 5px 0;
+            .useCoupon{
+                display: flex;
+                justify-content: space-between;
+                width: 40%;
             }
 
         }
@@ -527,6 +590,7 @@ export default {
         }
 
     }
+
     .confirm-checkout {
         display: flex;
         justify-content: center;

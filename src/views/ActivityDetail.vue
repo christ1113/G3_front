@@ -6,8 +6,8 @@
     }" :pagination="{
       el: '.swiper-pagination',
       clickable: true,
-    }" :mousewheel="false" :keyboard="true" :loop="true" :modules="modules" class="mySwiper">
-      <swiper-slide><img src="../assets/pic/activity/activity-9.jpg" alt=""></swiper-slide>
+    }" :mousewheel="false" :keyboard="true" :loop="true" :modules="modules" class="mySwiper" v-if="selectedActivity">
+      <swiper-slide><img :src="parseImg(selectedActivity.pic)" alt="活動圖片"></swiper-slide>
       <swiper-slide><img src="../assets/pic/activity/activity-8.jpg" alt=""></swiper-slide>
       <swiper-slide><img src="../assets/pic/activity/activity-7.jpg" alt=""></swiper-slide>
       <swiper-slide><img src="../assets/pic/activity/activity-9.jpg" alt=""></swiper-slide>
@@ -17,9 +17,9 @@
       <div class="swiper-pagination"></div>
     </swiper>
   </section>
-  <section class="section-activity-info">
+  <section class="section-activity-info" v-if="selectedActivity">
     <div class="activity-info">
-      <h4>高雄 | 油紙傘彩繪 DIY 體驗課程</h4>
+      <h4>{{ selectedActivity.loc }} | {{ selectedActivity.title }}</h4>
       <h5>-活動介紹-</h5>
       <p>油紙傘彩繪課程是一個結合傳統工藝與現代藝術的手作體驗活動。參加者將學習如何製作和裝飾油紙傘，了解這項古老技藝的文化背景，並創作出獨一無二的藝術作品。本課程適合所有年齡層，無需任何手工或繪畫基礎。</p>
       <h5>-活動內容-</h5>
@@ -61,21 +61,29 @@
       </div>
       <div class="date">
         <h5>活動日期</h5>
-        <p>2024.07.14(日)</p>
+        <p>{{ selectedActivity.date }}</p>
       </div>
       <div class="session-time">
         <h5>場次時間</h5>
         <div class="time">
-          <button @click="chooseTime('10:00~12:00')"
-            :class="{ 'choose-time': currentTime === '10:00~12:00' }">10:00~12:00</button>
-          <button @click="chooseTime('13:00~15:00')"
-            :class="{ 'choose-time': currentTime === '13:00~15:00' }">13:00~15:00</button>
+          <!-- <button @click="chooseTime('10:00~12:00')" :class="{ 'choose-time': currentTime === '10:00~12:00' }">
+            {{ selectedActivity.time1 }}
+          </button>
+          <button @click="chooseTime('13:00~15:00')" :class="{ 'choose-time': currentTime === '13:00~15:00' }">
+            {{ selectedActivity.time2 }}
+          </button> -->
+          <button @click="chooseTime('10:00~12:00')" :class="{ 'choose-time': currentTime === '10:00~12:00' }">
+            {{ selectedActivity.time1 }}
+          </button>
+          <button @click="chooseTime('13:00~15:00')" :class="{ 'choose-time': currentTime === '13:00~15:00' }">
+            {{ selectedActivity.time2 }}
+          </button>
         </div>
       </div>
       <div class="num">
         <h5>選擇人數</h5>
         <div class="amount-button">
-          <p>NT${{ price }}/人</p>
+          <p>{{ selectedActivity.price }}/人</p>
           <button @click="minus"><i class="fa-solid fa-minus"></i></button>
           <p>{{ count }}</p>
           <button @click="plus"><i class="fa-solid fa-plus"></i></button>
@@ -86,11 +94,12 @@
         <p>NT${{ total }}</p>
       </div>
       <hr>
-      <button class="btn">
-        <routerLink to="/checkout_act">立即預約</routerLink>
+      <button class="btn" @click="reserveActivity">
+        立即預約
       </button>
 
     </div>
+    
   </section>
 
   <section class="section-activity-notice">
@@ -141,50 +150,31 @@ import 'swiper/css/pagination';
 import { Navigation, Pagination, Mousewheel, Keyboard } from 'swiper/modules';
 
 // Import leaflet styles and components
-import { onMounted, ref } from "vue";
+// import { onMounted, ref } from "vue";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import mapMarkerUrl from "../assets/pic/activity/map-marker.png";
 
-export default {
+import { useActivityStore } from '../stores/activitycheckout.js';
+import { useRouter } from 'vue-router';
 
+// import SuccessModal from '../components/layout/SuccessModal.vue';
+
+export default {
   data() {
     return {
+      activities: [],
+      selectedActivity: null,
       count: 1,
       price: 499,
-      currentTime: '',
+      currentTime: null,
+      modules: [Navigation, Pagination, Mousewheel, Keyboard],
+      mapContainer: null,
     }
   },
   components: {
     Swiper,
     SwiperSlide,
-  },
-  setup() {
-    const mapContainer = ref(null);
-
-    onMounted(() => {
-      const map = L.map(mapContainer.value, {
-        center: [22.602995, 120.306013],
-        zoom: 17,
-      });
-
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-      }).addTo(map);
-
-      // L.marker
-      const mapMarker = L.icon({
-        iconUrl: mapMarkerUrl,
-        iconSize: [35, 70],
-        iconAnchor: [15, 75],
-      });
-
-      L.marker([22.602995, 120.306013], { icon: mapMarker }).addTo(map);
-    });
-    return {
-      modules: [Navigation, Pagination, Mousewheel, Keyboard],
-      mapContainer,
-    };
   },
   computed: {
     total() {
@@ -192,6 +182,37 @@ export default {
     }
   },
   methods: {
+    chooseTime(time) {
+      this.currentTime = time;
+    },
+    reserveActivity() {
+      if (this.currentTime) {
+        this.activityStore.setActivityDetails(
+          this.count,
+          this.currentTime,
+          this.total,
+          this.selectedActivity.loc,
+          this.parseImg(this.selectedActivity.pic));
+        this.router.push(`/checkout_act?id=${this.$route.params.id}&time=${this.currentTime}`);
+      } else{
+        alert('請先選擇場次時間');
+      }
+    },
+    parseImg(file) {
+      // 指到src || ..的意思是“回到上一層”
+      return new URL(`../assets/pic/activity/${file}`, import.meta.url).href;
+    },
+    async fetchActivities() {
+      try {
+        const response = await fetch(`${import.meta.env.BASE_URL}activities.json`);
+        this.activities = await response.json();
+        if (this.activities.length > 0) {
+          this.selectedActivity = this.activities[0]; // 預設選擇第一個活動
+        }
+      } catch (error) {
+        console.error('Error fetching activities:', error);
+      }
+    },
     plus() {
       this.count += 1;
     },
@@ -199,9 +220,29 @@ export default {
       if (this.count == 1) return
       this.count -= 1;
     },
-    chooseTime(time) {
-      this.currentTime = time;
-    },
+  },
+  mounted() {
+    this.fetchActivities();
+    const map = L.map(this.$refs.mapContainer, {
+      center: [22.602995, 120.306013],
+      zoom: 17,
+    });
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    }).addTo(map);
+
+    const mapMarker = L.icon({
+      iconUrl: mapMarkerUrl,
+      iconSize: [35, 70],
+      iconAnchor: [15, 75],
+    });
+
+    L.marker([22.602995, 120.306013], { icon: mapMarker }).addTo(map);
+  },
+  created() {
+    this.activityStore = useActivityStore();
+    this.router = useRouter();
   }
 };
 </script>
