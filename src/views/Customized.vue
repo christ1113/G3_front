@@ -77,13 +77,13 @@
                                 </div>
                                 <span>I-Con</span>
                             </div>
-                            <div class="item">
+                            <div class="item" @click="undo()">
                                 <div class="icon">
                                     <img src="/src/assets/pic/customized/customized-back.png" alt="">
                                 </div>
                                 <span>上一步</span>
                             </div>
-                            <div class="item">
+                            <div class="item" @click="removeAll()">
                                 <div class="icon">
                                     <img src="/src/assets/pic/customized/customized-reset.png" alt="">
                                 </div>
@@ -92,12 +92,14 @@
                         </div>
                         <div class="img-group" v-if="currentGroup === 'upload' || currentGroup === 'template' || currentGroup === 'icon'">
                             <div class="pics">
-                                <div class="pic" v-for="(pic, index) in getImageList(currentGroup)" :key="index" @click="selectImage(pic)">
-                                    <img :src="pic" :alt="'pic' + index">
+                                <label for="upload" class="upload" v-if="currentGroup === 'upload'">
+                                    點擊上傳
+                                    <input type="file" name="upload" id="upload" @change="handleFileUpload">
+                                </label>
+                                <div class="pic" v-for="(pic, index) in getImageList(currentGroup)" :key="index" @click="selectImage(pic.img)">
+                                    <img :src="pic.img">
                                 </div>
-                                <div class="upload" v-if="currentGroup === 'upload'">
-                                    <input type="file" @change="handleFileUpload">
-                                </div>
+                                
                             </div>
                         </div>
                     </div>
@@ -135,8 +137,8 @@
                             <h5>效果預覽</h5>
                             <div class="pic-back">
                                 <div class="pic">
-                                    <img :src="selectedImage" v-if="selectedImage">
-                                    <img src="/src/assets/pic/customized/Preview.png" alt="" v-if="!selectedImage">
+                                    <img :src="selectedImage" v-if="designItems.length > 0">
+                                    <img src="/src/assets/pic/customized/Preview.png" alt=""  v-else="!designItems">
                                 </div>
                             </div>
                         </div>
@@ -255,6 +257,7 @@
                 // step 2
 
                 showBox2: false,
+                operationHistory: [], // 儲存使用者動作
                 designItems: [], // 存放圖案位置 { src, top, left, scale, zIndex }
                 selectedImage: null,
                 currentGroup: null,
@@ -268,25 +271,22 @@
                 initialItemTop: 0,
                 initialScale: 1,
                 picArrays: {
-                    upload: [
-                        // '/src/assets/pic/customized/Icon-1.png',
-                        // '/src/assets/pic/customized/Icon-1.png'
-                    ],
+                    upload: [],
                     template: [
-                        '/src/assets/pic/customized/icon-2.png',
-                        '/src/assets/pic/customized/icon-3.png',
+                        { img: 'icon-2.png' },
+                        { img: 'icon-3.png' }
                     ],
                     icon: [
-                        '/src/assets/pic/customized/icon-1.png',
-                        '/src/assets/pic/customized/icon-2.png',
-                        '/src/assets/pic/customized/icon-3.png',
-                        '/src/assets/pic/customized/icon-4.png',
-                        '/src/assets/pic/customized/icon-5.png',
-                        '/src/assets/pic/customized/icon-6.png',
-                        '/src/assets/pic/customized/icon-7.png',
-                        '/src/assets/pic/customized/icon-8.png',
-                        '/src/assets/pic/customized/icon-9.png',
-                    ],
+                        { img: 'icon-1.png' },
+                        { img: 'icon-2.png' },
+                        { img: 'icon-3.png' },
+                        { img: 'icon-4.png' },
+                        { img: 'icon-5.png' },
+                        { img: 'icon-6.png' },
+                        { img: 'icon-7.png' },
+                        { img: 'icon-8.png' },
+                        { img: 'icon-9.png' }
+                    ]
                 },
 
                 // step 3
@@ -337,6 +337,10 @@
             },
 
             // step 2
+            saveToHistory() {
+                this.operationHistory.push(JSON.parse(JSON.stringify(this.designItems)));
+            },
+
             finalDesign(){
                 this.currentStep++ ;
                 this.showBox2 = false;
@@ -351,33 +355,48 @@
             },
 
             getImageList(group) {
-                return this.picArrays[group] || [];
+                let arrs = []
+                arrs = JSON.parse(JSON.stringify(this.picArrays[group]))
+                arrs.forEach(element => {
+                    element.img = (group === 'upload' ? element.img : this.parseIcon(element.img))
+                });
+                return arrs;
             },
+
             handleFileUpload(event) {
                 const file = event.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        this.picArrays.upload.push(e.target.result);
-                    };
-                    reader.readAsDataURL(file);
-                }
+                // if (file) {
+                //     const reader = new FileReader();
+                //     reader.onload = (e) => {
+                //         this.picArrays.upload.push(e.target.result);
+                //     };
+                //     reader.readAsDataURL(file);
+                // }
+                this.picArrays.upload.push({img: (window.URL.createObjectURL(event.target.files[0]))})
+                this.saveToHistory();
             },
+
+
 
             selectImage(image) {
                 const img = new Image();
                 img.onload = () => {
+                    const aspectRatio = img.width / img.height;
+                    const desiredWidth = 200;  
+                    const desiredHeight = desiredWidth / aspectRatio;
+
                     const newItem = {
                     src: image,
                     top: 100,
                     left: 100,
-                    width: img.width,
-                    height: img.height,
+                    width: desiredWidth,
+                    height: desiredHeight,
                     scale: 1,
                     zIndex: this.designItems.length + 1
                     };
                     this.designItems.push(newItem);
                     this.updatePreview();
+                    this.saveToHistory();
                 };
                 img.src = image;
             },
@@ -443,11 +462,11 @@
                             maskCtx.drawImage(clipImage, 0, 0, canvas.width, canvas.height);
 
                             // 應用遮色片到 finalCanvas
-                            finalCtx.globalCompositeOperation = 'destination-in';
+                            finalCtx.globalCompositeOperation = 'destination-over';
                             finalCtx.drawImage(maskCanvas, 0, 0);
 
                             // 重置混合模式
-                            finalCtx.globalCompositeOperation = 'source-over';
+                            // finalCtx.globalCompositeOperation = 'source-over';
 
                             // 更新預覽圖
                             this.selectedImage = finalCanvas.toDataURL();
@@ -460,6 +479,7 @@
 
                             // 如果你需要 base64 格式的圖片, 也可以保留這部分
                             this.selectedImage = URL.createObjectURL(blob);
+                            console.log(this.selectedImage)
                         });
                         // 需處理 formData的問題，imageURL BASE字元太多
 
@@ -498,6 +518,7 @@
                 document.removeEventListener('mousemove', this.moveItem);
                 document.removeEventListener('mouseup', this.stopMoving);
                 this.updatePreview();
+                this.saveToHistory();
             },
             startResize(index, e) {
                 e.stopPropagation();
@@ -522,10 +543,12 @@
                 document.removeEventListener('mousemove', this.resize);
                 document.removeEventListener('mouseup', this.stopResize);
                 this.updatePreview();
+                this.saveToHistory();
             },
             removeItem(index) {
                 this.designItems.splice(index, 1);
                 this.updatePreview();
+                this.saveToHistory();
             },
 
             deselectAll(e) {
@@ -534,12 +557,26 @@
                     this.selectedItemIndex = null;
                 }
             },
-
+            removeAll(){
+                this.designItems = [];
+                this.updatePreview();
+                this.saveToHistory();
+            },
             removeItem(index) {
                 // 雙擊移除圖案
                 this.designItems.splice(index, 1);
                 // 移除預覽圖案
                 this.selectedImage = null; 
+            },
+
+            // 上一步
+            undo() {
+                if (this.operationHistory.length > 1) {
+                    this.operationHistory.pop();
+                    const previousState = this.operationHistory[this.operationHistory.length - 1];
+                    this.designItems = JSON.parse(JSON.stringify(previousState));
+                    this.updatePreview();
+                }
             },
 
             // step3 ----
@@ -564,6 +601,7 @@
             document.addEventListener('click', this.handleClickOutside);
             document.addEventListener('mousemove', this.resize);
             document.addEventListener('mouseup', this.stopResize);
+            this.saveToHistory();
         },
         beforeUnmount() {
             document.removeEventListener('mousemove', this.resize);

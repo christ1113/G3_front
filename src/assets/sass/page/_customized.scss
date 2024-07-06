@@ -296,13 +296,13 @@
                         z-index: 1;
                         .pics{
                             width: 130px;
-                            padding: 20px 0;
+                            padding: 20px 4px;
                             float: right;
                             display: flex;
                             flex-wrap: wrap;
                             .pic{
                                 margin: 5px;
-                                width: 40%;
+                                width: 42%;
                                 height: 50px;
                                 border-radius: 5px;
                                 background-color: white;
@@ -310,6 +310,20 @@
                                 cursor: pointer;
                                 img{
                                     height: 100%;
+                                }
+                            }
+                            .upload{
+                                display: inline-block;
+                                margin: 0 auto 15px;
+                                width: 62%;
+                                padding: 10px 20px;
+                                background-color: white;
+                                font-weight: 600;
+                                color: #94150C;
+                                cursor: pointer;
+                                border-radius: 20px;
+                                input[type="file"]{
+                                    display: none;
                                 }
                             }
                         }
