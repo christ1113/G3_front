@@ -186,23 +186,21 @@
                     <div class="txt">
                         <h3>特製手工油紙傘</h3>
                         <span class="tag">獨一無二</span>
-                            <span>NT$ {{price}}</span>
+                            <span>NT$ {{customizedData.price}}</span>
                             <span>合計$ {{total}}</span>
                         <div class="amount">
                             <span>數量：</span>
                             <button @click="decrement()"><i class="fa-solid fa-minus"></i></button>
-                            <span>{{amount}}</span>
+                            <span>{{customizedData.amount}}</span>
                             <button @click="increment()"><i class="fa-solid fa-plus"></i></button>
                         </div>
                         <div class="button">
-                            <router-link to="/checkout_self-prod">
-                                <button class="btn">
+                                <button class="btn" @click="uploadFinalImg()">
                                         <svg width="25" height="21" viewBox="0 0 25 21" fill="none" xmlns="http://www.w3.org/2000/svg">
                                         <path d="M25 2.6061V18.2427C25 18.9594 24.7552 19.5729 24.2656 20.0833C23.776 20.5937 23.1875 20.8488 22.5 20.8488H2.5C1.8125 20.8488 1.22396 20.5937 0.734375 20.0833C0.244792 19.5729 0 18.9594 0 18.2427V2.6061C0 1.88943 0.244792 1.27591 0.734375 0.765543C1.22396 0.255181 1.8125 0 2.5 0H22.5C23.1875 0 23.776 0.255181 24.2656 0.765543C24.7552 1.27591 25 1.88943 25 2.6061ZM2.5 5.21221H22.5V2.6061H2.5V5.21221ZM2.5 10.4244V18.2427H22.5V10.4244H2.5Z" fill="white"/>
                                         </svg>
                                     直接購買
                                 </button>
-                            </router-link>
                             <router-link to="/product">
                                 <button class="btn">取消</button>
                             </router-link>
@@ -231,7 +229,9 @@
 </template>
 
 <script>
-    import { useCustomizedStore } from '../stores/customized.js'
+    import { useCustomizedStore } from '@/stores/customized.js'
+    import{mapState,mapActions}from 'pinia'
+    import { useRouter } from 'vue-router'
 
     export default{
         data() {
@@ -292,28 +292,30 @@
                 // step 3
                 smallPics: [
                     { 
-                        img: 'finish.jpg'
+                        img:''
                     },
                     { 
                         img: 'finish2.jpg'
                     }
                 ],
                 bigPic: { 
-                    img: 'finish.jpg'
+                    img: ''
                 },
-                price: 999,
-                amount:1
                 }
         },
         computed: {
-            total() {
-            return this.price * this.amount;
-            }
+            // 引用data , 總計
+            ...mapState(useCustomizedStore,['customizedData','total']),
         },
         methods: {
             parseIcon(file) {
-            // 指到src || ..的意思是“回到上一層”
-            return new URL(`../assets/pic/customized/${file}`, import.meta.url).href
+                if(file.indexOf('blob') === -1){
+                    // 指到src || ..的意思是“回到上一層”
+                    return new URL(`../assets/pic/customized/${file}`, import.meta.url).href
+                } else {
+                    return file
+                }
+            
             },
 
             // step1 沒被選擇的變暗
@@ -344,6 +346,8 @@
             finalDesign(){
                 this.currentStep++ ;
                 this.showBox2 = false;
+                this.smallPics[0].img = this.selectedImage
+                this.bigPic.img = this.selectedImage
             },
 
             showGroup(group) {
@@ -403,18 +407,22 @@
 
             updatePreview() {
                 const canvas = this.$refs.hiddenCanvas;
-                const ctx = canvas.getContext('2d');
                 const designCanvas = this.$refs.designCanvas;
 
-                // 設置canvas大小與設計區域相同
+                // 設置 canvas 大小與設計區域相同
                 canvas.width = designCanvas.offsetWidth;
                 canvas.height = designCanvas.offsetHeight;
 
-                // 創建兩個額外的canvas：一個用於繪製設計，一個用於最終的混合效果
-                const designLayer = document.createElement('canvas');
-                const finalCanvas = document.createElement('canvas');
-                designLayer.width = finalCanvas.width = canvas.width;
-                designLayer.height = finalCanvas.height = canvas.height;
+                // 創建設計層和最終層 canvas
+                const createCanvas = () => {
+                    const tempCanvas = document.createElement('canvas');
+                    tempCanvas.width = canvas.width;
+                    tempCanvas.height = canvas.height;
+                    return tempCanvas;
+                };
+
+                const designLayer = createCanvas();
+                const finalCanvas = createCanvas();
                 const designCtx = designLayer.getContext('2d');
                 const finalCtx = finalCanvas.getContext('2d');
 
@@ -429,63 +437,45 @@
                             designCtx.scale(item.scale, item.scale);
                             designCtx.drawImage(img, 0, 0, item.width, item.height);
                             designCtx.restore();
-                            resolve();          
+                            resolve();
                         };
                         img.src = item.src;
                     }));
 
+                // 加載圖片並返回 Promise
+                const loadImage = src => new Promise(resolve => {
+                    const img = new Image();
+                    img.onload = () => resolve(img);
+                    img.src = src;
+                });
+
                 // 當所有設計元素都繪製完成後，進行最終的混合
                 Promise.all(drawPromises).then(() => {
-                    // 在 finalCanvas 上填充白色背景
-                    finalCtx.fillStyle = 'white';
-                    finalCtx.fillRect(0, 0, canvas.width, canvas.height);
-
-                    // 加載背景圖
-                    const backgroundImage = new Image();
-                    backgroundImage.onload = () => {
+                    Promise.all([
+                        loadImage('/src/assets/pic/customized/Preview.png'), // 替換為實際的背景圖路徑
+                        loadImage('/src/assets/pic/customized/Preview.png')  // 替換為實際的遮色片圖路徑
+                    ]).then(([backgroundImage, clipImage]) => {
                         // 在 finalCanvas 上繪製背景
                         finalCtx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
 
                         // 繪製設計層
                         finalCtx.drawImage(designLayer, 0, 0);
 
-                        // 創建一個新的canvas來應用遮色片
-                        const maskCanvas = document.createElement('canvas');
-                        maskCanvas.width = canvas.width;
-                        maskCanvas.height = canvas.height;
+                        // 創建遮色片層
+                        const maskCanvas = createCanvas();
                         const maskCtx = maskCanvas.getContext('2d');
+                        maskCtx.drawImage(clipImage, 0, 0, canvas.width, canvas.height);
 
-                        // 加載並繪製遮色片
-                        const clipImage = new Image();
-                        clipImage.onload = () => {
-                            // 在 maskCanvas 上繪製遮色片
-                            maskCtx.drawImage(clipImage, 0, 0, canvas.width, canvas.height);
-
-                            // 應用遮色片到 finalCanvas
-                            finalCtx.globalCompositeOperation = 'destination-over';
-                            finalCtx.drawImage(maskCanvas, 0, 0);
-
-                            // 重置混合模式
-                            // finalCtx.globalCompositeOperation = 'source-over';
-
-                            // 更新預覽圖
-                            this.selectedImage = finalCanvas.toDataURL();
-                        };
+                        // 應用遮色片到 finalCanvas
+                        finalCtx.globalCompositeOperation = 'destination-in';
+                        finalCtx.drawImage(maskCanvas, 0, 0);
 
                         // 將 finalCanvas 轉換為 Blob
                         finalCanvas.toBlob(blob => {
-                            // 傳遞 blob 到空物件
                             this.imageBlob = blob;
-
-                            // 如果你需要 base64 格式的圖片, 也可以保留這部分
                             this.selectedImage = URL.createObjectURL(blob);
-                            console.log(this.selectedImage)
                         });
-                        // 需處理 formData的問題，imageURL BASE字元太多
-
-                        clipImage.src = '/src/assets/pic/customized/Preview.png'; // 請替換為實際的遮色片圖路徑
-                    };
-                    backgroundImage.src = '/src/assets/pic/customized/Preview.png'; // 請替換為實際的背景圖路徑
+                    });
                 });
             },
 
@@ -580,20 +570,16 @@
             },
 
             // step3 ----
+            // 上傳客製圖至pinia、加減數量
+            ...mapActions(useCustomizedStore,['uploadImg','decrement','increment']),
+            uploadFinalImg(){
+                this.uploadImg(this.selectedImage)
+                this.$router.push('/checkout_self-prod')
+            },
             // 小圖變大圖
             showBigPic(src) {
                 this.bigPic.img = src;
             },
-            // 數量++
-            increment() {
-                this.amount++;
-            },
-            // 數量--
-            decrement() {
-                if (this.amount > 1) {
-                    this.amount--;
-                }
-            }
 
         },
         mounted() {

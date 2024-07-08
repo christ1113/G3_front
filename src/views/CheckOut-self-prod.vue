@@ -1,7 +1,8 @@
 <template>
     <div class="go-back">
         <router-link to="/customized">
-            <返回客製化頁面 </router-link>
+            返回客製化頁面 
+        </router-link>
     </div>
     <div class="checkout-container">
         <div class="confirm-info">
@@ -36,7 +37,7 @@
 
             <div class="prod-info">
                 <!-- <button><i class="fa-solid fa-chevron-down"></i></button> -->
-                <img class="prod-img" src="../assets/pic/um2.jpg" alt="客製化商品">
+                <img class="prod-img" :src="customizedData.img" alt="客製化商品">
                 <div class="prod-spec">
                     <div class="prod-card">
                         <h5>特製手工油紙傘</h5>
@@ -44,10 +45,10 @@
                         <div class="mention">*暫不支持超商取貨</div>
                     </div>
                     <div class="prod-count">
-                        數量：<span>1/隻</span>
+                        數量：<span>{{customizedData.amount}}/隻</span>
                     </div>
                     <div class="prod-sum">
-                        總計：NT$<span>999</span>
+                        總計：NT$<span>{{total}}</span>
                     </div>
                     <!-- <div class="prod-card">
                         <h5>數字精緻手工油紙傘</h5>
@@ -188,7 +189,7 @@
             </div>
             <div class="disc-line"></div>
             <div class="invoice-total">
-                <p>總計：NT$999</p>
+                <p>總計：NT${{total}}</p>
             </div>
         </div>
         <div class="confirm-checkout">
@@ -197,6 +198,10 @@
     </div>
 </template>
 <script>
+    // 客製化圖片存儲地
+    import { useCustomizedStore } from '@/stores/customized.js'
+    import{mapState}from 'pinia'
+
 export default {
     data() {
         return {
@@ -220,7 +225,10 @@ export default {
         },
         filteredDistricts() {
             return this.cities.filter(city => city.city_name == this.selectedCity);
-        }
+        },
+
+        // 引用客製化data , 總計
+        ...mapState(useCustomizedStore,['customizedData','total']),
     },
     created() {
         this.fetchCities();
@@ -341,11 +349,18 @@ export default {
             }
 
             .prod-img {
-                height: auto;
+                background-color: #ffffff;
+                // height: auto;
                 width: 20%;
                 object-fit: cover;
                 border-radius: 20px;
                 margin: auto 10px auto 0;
+                // img{
+                //     width: 100%;
+                //     height: 100%;
+                //     object-fit: cover;
+                //     vertical-align: middle;
+                // }
 
             }
 
