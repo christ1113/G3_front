@@ -3,12 +3,12 @@
         <div class="header-nav">
             <div class="logo">
                 <RouterLink to="/"><img class="desktop-logo" src="../../assets/pic/logo.png" alt="logo"></RouterLink>
-                <RouterLink to="/"><img class="mobile-logo" src="../../assets/pic/logo-mobile.svg" alt="logo"></RouterLink>
+                <RouterLink to="/"><img class="mobile-logo" src="../../assets/pic/logo-mobile.svg" alt="logo">
+                </RouterLink>
             </div>
             <nav class="desktop-menu">
                 <ul>
-                    <li v-for="link in links" :key="link.path" class="menu-item" @mouseover="showSubMenu(link)"
-                        @mouseleave="hideSubMenu(link)">
+                    <li v-for="link in links" :key="link.path" class="menu-item">
                         <a v-if="link.submenu" href="#" @click.prevent="toggleSubMenu(link)">
                             {{ link.name }}
                         </a>
@@ -51,17 +51,24 @@
                 </button>
             </div>
         </div>
-        <div v-if="menuOpen" class="mobile-menu">
+        <!-- <div v-if="menuOpen" class="mobile-menu"> -->
+            <div :class="['mobile-menu', { open: menuOpen, close: !menuOpen }]" :data-initial-render="initialRender">
+            <div class="overlay-background" @click="toggleMenu" v-show="menuOpen"></div>
             <ul>
                 <li v-for="(link, index) in links" :key="link.path">
-                    <a href="#" @click.prevent="toggleSubMenu(index)">
+                    <!-- 修改这里：移除 @click.prevent -->
+                    <a href="#" @click.prevent="handleMainMenuClick(link, index)">
                         {{ link.name }}
+                        <i v-if="link.submenu"
+                            :class="{ 'fa-solid fa-chevron-down': !link.showSubMenu, 'fa-solid fa-chevron-up': link.showSubMenu }"></i>
                     </a>
-                    <ul v-if="link.submenu && link.showSubMenu">
+                    <transition name="slide-fade">
+                    <ul style="position: static; height: auto;" v-if="link.submenu && link.showSubMenu" class="submenu">
                         <li v-for="sublink in link.submenu" :key="sublink.path">
-                            <RouterLink :to="sublink.path" @click="toggleMenu">{{ sublink.name }}</RouterLink>
+                            <RouterLink :to="sublink.path" @click="closeMenu">{{ sublink.name }}</RouterLink>
                         </li>
                     </ul>
+                </transition>
                 </li>
             </ul>
         </div>
@@ -88,7 +95,8 @@ export default {
                 { name: '知識小學堂', path: '/quiz' }
             ],
             menuOpen: false,
-            activeSubMenu: null
+            activeSubMenu: null,
+            initialRender: true // 新增這一行
         };
     },
     computed: {
@@ -126,12 +134,61 @@ export default {
         toggleMenu() {
             this.menuOpen = !this.menuOpen;
             this.activeSubMenu = null;
+            this.firstRender = false; // 菜單第一次打開後禁用初始狀態
         },
+        // toggleSubMenu(index) {
+        //     console.log(this.links[index])
+        //     if (this.activeSubMenu === index) {
+        //         this.activeSubMenu = null;
+        //     } else {
+        //         this.activeSubMenu = index;
+        //     }
+        //     console.log(this.links[index].showSubMenu)
+        //     this.links[index].showSubMenu = !this.links[index].showSubMenu;
+        //     console.log(this.links[index].showSubMenu)
+
+        //     setTimeout(() => {
+        //         console.log(this.links[index].showSubMenu)
+
+        //     }, 2000)
+        // },
         toggleSubMenu(index) {
-            if (this.activeSubMenu === index) {
-                this.activeSubMenu = null;
+    // console.log('Before toggle:', this.links[index]);
+
+    if (this.activeSubMenu === index) {
+        this.activeSubMenu = null;
+    } else {
+        this.activeSubMenu = index;
+    }
+
+    this.links[index].showSubMenu = !this.links[index].showSubMenu;
+    console.log('After toggle:', this.links[index].showSubMenu);
+
+    this.$nextTick(() => {
+        const submenu = this.$el.querySelector(`.mobile-menu ul li:nth-child(${index + 1}) .submenu`);
+        if (submenu) {
+            if (this.links[index].showSubMenu) {
+                submenu.style.maxHeight = submenu.scrollHeight + "px";
+                // console.log('Submenu opened, maxHeight:', submenu.style.maxHeight);
             } else {
-                this.activeSubMenu = index;
+                submenu.style.maxHeight = "0px";
+                // console.log('Submenu closed, maxHeight:', submenu.style.maxHeight);
+            }
+        }
+    });
+
+    setTimeout(() => {
+        console.log('After 2 seconds:', this.links[index].showSubMenu);
+    }, 2000);
+},
+        handleMainMenuClick(link, index) {
+            console.log(link.submenu)
+            console.log(link)
+            if (link.submenu) {
+                this.toggleSubMenu(index);
+            } else {
+                this.$router.push(link.path);
+                this.closeMenu();
             }
         },
         handleResize() {
@@ -139,14 +196,31 @@ export default {
                 this.menuOpen = false;
                 this.activeSubMenu = null;
             }
-        }
+        },
+        closeMenu() {
+            this.menuOpen = false;
+            this.links.forEach(link => {
+                if (link.submenu) {
+                    link.showSubMenu = false;
+                }
+            });
+        },
     },
     mounted() {
         window.addEventListener('resize', this.handleResize);
+
+        // 更新路由監聽器
+        this.$router.afterEach(() => {
+        this.closeMenu(); // 使用新的 closeMenu 方法
+    });
+    setTimeout(() => {
+            this.initialRender = false;
+        }, 0);
     },
     beforeUnmount() {
         window.removeEventListener('resize', this.handleResize);
-    }
+        // 如果有必要，移除路由监听器
+    },
 }
 </script>
 
