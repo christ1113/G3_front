@@ -348,8 +348,15 @@
             finalDesign(){
                 this.currentStep++ ;
                 this.showBox2 = false;
-                this.smallPics[0].img = this.selectedImage
-                this.bigPic.img = this.selectedImage
+                // 檢查 selectedImage 是否 null 或 undefined
+                if (this.selectedImage) {
+                    this.smallPics[0].img = this.selectedImage;
+                    this.bigPic.img = this.selectedImage;
+                } else {
+                    this.selectedImage = 'Preview.png';
+                    this.smallPics[0].img = this.selectedImage;
+                    this.bigPic.img = this.selectedImage;
+                }
                 this.customizedData.amount = 1
             },
 

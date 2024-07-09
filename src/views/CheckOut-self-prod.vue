@@ -356,7 +356,7 @@ export default {
             }
 
             .prod-img {
-                background-color: #ffffff;
+                background-color: #eeedf5;
                 // height: auto;
                 width: 20%;
                 object-fit: cover;
