@@ -12,10 +12,10 @@
         <button @click="filterByStatus('全部')" :class="{ 'default-status': currentStatus === '全部' }">
           <p>全部</p>
         </button>
-        <button @click="filterByStatus('進行中')" :class="{ 'default-status': currentStatus === '進行中' }">
+        <button @click="filterByStatus(1)" :class="{ 'default-status': currentStatus === 1 }">
           <p>進行中</p>
         </button>
-        <button @click="filterByStatus('已結束')" :class="{ 'default-status': currentStatus === '已結束' }">
+        <button @click="filterByStatus(2)" :class="{ 'default-status': currentStatus === 2 }">
           <p>已結束</p>
         </button>
       </div>
@@ -24,13 +24,13 @@
         <button @click="filterByType('全部')" :class="{ 'default-type': currentType === '全部' }">
           <p>全部</p>
         </button>
-        <button @click="filterByType('DIY 手作')" :class="{ 'default-type': currentType === 'DIY 手作' }">
+        <button @click="filterByType(0)" :class="{ 'default-type': currentType === 0 }">
           <p>DIY 手作</p>
         </button>
-        <button @click="filterByType('導覽預約')" :class="{ 'default-type': currentType === '導覽預約' }">
+        <button @click="filterByType(1)" :class="{ 'default-type': currentType === 1 }">
           <p>導覽預約</p>
         </button>
-        <button @click="filterByType('文創市集')" :class="{ 'default-type': currentType === '文創市集' }">
+        <button @click="filterByType(2)" :class="{ 'default-type': currentType === 2 }">
           <p>文創市集</p>
         </button>
       </div>
@@ -59,19 +59,18 @@
             <div class="choose-date">
               <p>日期選擇</p>
             </div>
-            <v-date-picker v-model="range" :value="null" color="red" is-range title-position="left">
-              <template v-slot="{ inputValue, inputEvents }">
-                <div class="vcalendar">
-                  <input class="input-date" :value="inputValue.start" v-on="inputEvents.start" placeholder="開始日期"/>
-                  <div class="icon">
-                    <h4>~</h4>
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="0"
-                      d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                  </div>
-                  <input class="input-date" :value="inputValue.end" v-on="inputEvents.end" placeholder="結束日期"/>
-                </div>
-              </template>
-            </v-date-picker>
+            <v-date-picker v-model="range" color="red" is-range title-position="left">
+          <template v-slot="{ inputValue, inputEvents }">
+            <div class="vcalendar">
+              <input class="input-date" :value="inputValue.start" v-on="inputEvents.start" placeholder="開始日期"/>
+              <div class="icon">
+                <h4>~</h4>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="0" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </div>
+              <input class="input-date" :value="inputValue.end" v-on="inputEvents.end" placeholder="結束日期"/>
+            </div>
+          </template>
+        </v-date-picker>
           </div>
           <hr>
           <div class="filter-result">
@@ -88,18 +87,17 @@
   </section>
   <section class="section-activity">
     <div class="activity-card" v-for="(activity, index) in filteredActivities" :key="index"
-      @click="goToActivityDetail(activity.id)">
+      @click="goToActivityDetail(activity.act_id)">
       <div class="card-pic">
-        <img :src="parseImg(activity.pic)" alt="活動圖片">
+        <img :src="parseImg(activity.act_img1)" alt="活動圖片">
       </div>
       <div class="card-title">
-        <h5>{{ activity.title }}</h5>
+        <h5>{{ activity.act_name }}</h5>
       </div>
-      <div class="card-date">{{ activity.date }}</div>
-      <div class="card-time1">{{ activity.time1 }}</div>
-      <div class="card-time2">{{ activity.time2 }}</div>
-      <div class="card-loc"><img src="@/assets/pic/activity/map.png" alt="">{{ activity.loc }}</div>
-      <div class="card-price">{{ activity.price }}</div>
+      <div class="card-date">{{ activity.act_date }}</div>
+      <div class="card-time">{{ activity.sess_time }}</div>
+      <div class="card-loc"><img src="@/assets/pic/activity/map.png" alt="">{{ activity.act_loc }}</div>
+      <div class="card-price">NT${{ activity.act_price }}</div>
     </div>
   </section>
 
@@ -127,15 +125,40 @@ export default {
       filterPending: false,  // 標示是否需要重新計算篩選結果
     };
   },
-  mounted() {
-    fetch(`${import.meta.env.BASE_URL}activities.json`)
-      .then(response => response.json())
-      .then(data => {
-        this.activities = data;
-        this.responseData = data;
+  // mounted() {
+  //   fetch(`${import.meta.env.BASE_URL}activities.json`)
+  //     .then(response => response.json())
+  //     .then(data => {
+  //       this.activities = data;
+  //       this.responseData = data;
         
-      })
-      .catch(error => console.error('Error fetching activities:', error));
+  //     })
+  //     .catch(error => console.error('Error fetching activities:', error));
+  mounted() {
+        const body = {
+            // 確保身體定義並包含正確的數據
+        };
+
+        fetch(`http://localhost/G3_php/activity.php`, {
+            method: "POST",
+            body: JSON.stringify(body)
+        })
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error('Network response was not ok ' + res.statusText);
+                }
+                return res.json();
+            })
+            .then(json => {
+                // 確認有沒有response
+                console.log(json);
+                this.responseData = json["data"]["list"];
+                this.activities = json["data"]["list"];
+                console.log(this.activities);
+            })
+            .catch(error => {
+                console.error('There has been a problem with your fetch operation:', error);
+            });
   },
   computed: {
     
@@ -144,15 +167,15 @@ export default {
       // 對 activities 數據進行篩選
       return this.activities.filter(activity => {
         // 檢查活動的狀態是否匹配當前篩選條件
-        const matchesStatus = this.currentStatus === '全部' || activity.status === this.currentStatus;
+        const matchesStatus = this.currentStatus === '全部' || activity.act_status === this.currentStatus;
         // 檢查活動的類型是否匹配當前篩選條件
-        const matchesType = this.currentType === '全部' || activity.type === this.currentType;
+        const matchesType = this.currentType === '全部' || activity.act_type === this.currentType;
         // 檢查活動的地點是否匹配當前篩選條件
-        const matchesLoc = this.currentLoc === '' || activity.loc === this.currentLoc;        
+        const matchesLoc = this.currentLoc === '' || activity.act_loc === this.currentLoc;        
         const matchesDate = !this.range.start || !this.range.end || 
-        (new Date(activity.date) >= new Date(this.range.start) && new Date(activity.date) <= new Date(this.range.end));
+            (new Date(activity.act_date) >= new Date(this.range.start) && new Date(activity.act_date) <= new Date(this.range.end));
         // 檢查活動的標題是否包含搜索關鍵字
-        const matchesSearch = activity.title.includes(this.search);
+        const matchesSearch = activity.act_name.includes(this.search);
         // 只有當活動同時滿足狀態、類型和搜索條件時，才會被篩選出來
         return matchesStatus && matchesType && matchesSearch && matchesLoc && matchesDate;
       });
@@ -177,14 +200,14 @@ export default {
       this.currentType = type;
     },
     filterByLoc(loc) {
-      this.filterPending = true;
+      this.filterPending = false;
       this.currentLoc = loc;
     },
     filterData() {
       this.filterPending = true;
       console.log(this.search);
       this.activities = this.responseData.filter((activity) => {
-        return activity.title.includes(this.search);
+        return activity.act_name.includes(this.search);
       });
     },
     clear() {
@@ -193,11 +216,7 @@ export default {
     },
     toggleFilterPopup() {
       this.showFilterPopup = !this.showFilterPopup;
-      if (this.showFilterPopup) {
-        document.body.style.overflow = 'hidden';
-      } else {
-        document.body.style.overflow = 'auto';
-      }
+      document.body.style.overflow = this.showFilterPopup ? 'hidden' : 'auto';
     },
     closeFilterPopup() {
       this.showFilterPopup = false;
@@ -205,12 +224,14 @@ export default {
     },
     clearFilters() {
       this.currentLoc = '';
-      this.range.start = null;
-      this.range.end = null;
+      this.range = { start: null, end: null };
+      this.filterPending = true;
     },
     applyFilters() {
       this.filterPending = true;
       this.toggleFilterPopup();
+      this.range.start = null;
+      this.range.end = null;
     }
   }
 }
