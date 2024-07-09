@@ -2,7 +2,6 @@
     <section class="mem-fav">
         <div class="mem-title">
             <h1>收藏清單</h1>
-
         </div>
         <hr />
 
@@ -13,18 +12,19 @@
                     <input @input="filterData" type="text" v-model="search" class="search-input" placeholder="搜尋商品名稱">
                     <i class="fa-solid fa-x" @click="clear"></i>
                 </div>
-                <div v-if="responseData.length === 0">loading...</div>
-                <div v-else-if="displayData.length === 0">nodata...</div>
+                <div v-if="favorites.length === 0">您的收藏清單是空的</div>
+                <div v-else-if="displayData.length === 0">沒有符合搜尋條件的商品</div>
                 <div v-else class="display-window">
-                    <ProductCard class="product-card" v-for="item in displayData" :key="item.id" :item="item" />
+                    <ProductCard class="product-card" v-for="item in displayData" :key="item.prod_id" :item="item" />
                 </div>
             </div>
-
         </div>
     </section>
 </template>
 
 <script>
+import { mapState, mapActions } from 'pinia'
+import { useFavStore } from '@/stores/fav'
 import MemberManageList from '../components/layout/MemberManageList.vue'
 import ProductCard from '@/components/layout/ProductCard.vue'
 
@@ -35,62 +35,42 @@ export default {
     },
     data() {
         return {
-            responseData: [],
-            displayData: [],
             search: "",
+            displayData: []
         }
     },
-    //可以用create也可以用mounted
-    // created() {
-    mounted() {
-        fetch(`${import.meta.env.BASE_URL}memberfav.json`)
-            .then(res => res.json())
-            .then(json => {
-                // 確認有沒有response
-                console.log(json);
-                // 備份還原用
-                this.responseData = json
-                // 顯示用
-                this.displayData = json.filter(item => item.fav === true);
-            })
+    computed: {
+        ...mapState(useFavStore, ['favorites']),
     },
     methods: {
-        clear() {
-            this.search = "";
-            this.displayData = [...this.responseData];
-        },
-        filterTag(event) {
-            const selectedTag = event.target.value || event.target.dataset.value;
-            if (selectedTag === 'default') {
-                this.displayData = [...this.responseData];
-            } else {
-                this.displayData = this.responseData.filter(item => item.tag === selectedTag);
-            }
-        },
+        ...mapActions(useFavStore, ['loadFavorites']),
         filterData() {
-            console.log(this.search)
-            this.displayData = this.responseData.filter((item) => {
-                // return item.name == this.search
-                return item.name.includes(this.search)
+            this.displayData = this.favorites.filter((item) => {
+                return item.prod_name.toLowerCase().includes(this.search.toLowerCase())
             })
         },
         clear() {
             this.search = "";
-            this.displayData = this.responseData;
+            this.displayData = [...this.favorites];
         },
-        sortData(event) {
-            const sortType = event.target.value;
-            if (sortType === 'highToLow') {
-                this.displayData.sort((a, b) => b.price - a.price);
-            } else if (sortType === 'lowToHigh') {
-                this.displayData.sort((a, b) => a.price - b.price);
-            } else {
-                this.displayData = [...this.responseData];
-            }
+    },
+    mounted() {
+        this.loadFavorites();
+        this.displayData = [...this.favorites];
+    },
+    watch: {
+        favorites: {
+            handler(newFavorites) {
+                if (!this.search) {
+                    this.displayData = [...newFavorites];
+                } else {
+                    this.filterData();
+                }
+            },
+            deep: true
         }
     }
 }
-
 </script>
 
 <style lang="scss" scoped>
