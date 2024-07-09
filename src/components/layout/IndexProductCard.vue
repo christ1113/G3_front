@@ -1,60 +1,67 @@
 <template>
-    <div v-if="item" class="card-index">
-        <router-link :to="`/product/${item.id}`">
+    <div v-if="item" class="card-single">
+        <router-link :to="`/product/${item.prod_id}`">
             <div class="card-pic">
-            <img v-if="item.pic1" :src="parseIcon(item.pic1)" :alt="item.name">
-            <img v-else src="" alt="">
-            <div class="card-fav">
-                <div class="card-fav-icon" @click.prevent="toogleFav(item.id)" >
-                    <i v-if="item.fav" class="fa-solid fa-heart"></i>
-                    <i v-else class="fa-regular fa-heart"></i>
+                <img v-if="item.prod_img1" :src="parseIcon(item.prod_img1)" :alt="item.prod_name">
+                <img v-else src="" alt="">
+                <div class="card-fav">
+                    <div class="card-fav-icon" @click.prevent="toggleFav(item)">
+                        <i v-if="isFavorite(item)" class="fa-solid fa-heart"></i>
+                        <i v-else class="fa-regular fa-heart"></i>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="card-txt">
-            <div class="card-tag">
-                <span>{{ item.tag || '' }}</span>
-            </div>
-            <div class="card-title">
-                {{ item.name || '' }}
-            </div>
-            <div class="card-rating">
-                <span v-for="star in Math.floor(item.rating)" :key="star">
-                    🌟
-                </span>
-            </div>
-            <div class="card-price">
-                NT${{ item.price || '' }}
-            </div>
+            <div class="card-txt">
+                <div class="card-tag">
+                    <span>{{ item.prod_category || '' }}</span>
+                </div>
+                <div class="card-title">
+                    {{ item.prod_name || '' }}
+                </div>
+                <div class="card-rating">
+                    <span v-for="star in Math.floor(item.prod_rating)" :key="star">
+                        🌟
+                    </span>
+                </div>
+                <div class="card-price">
+                    NT${{ item.prod_price || '' }}
+                </div>
 
-        </div>
+            </div>
         </router-link>
     </div>
 </template>
 
 <script>
+import { mapActions, mapGetters } from 'pinia'
+import { useFavStore } from '@/stores/fav'
+
 export default {
     props: ['item'],
     methods: {
+        ...mapActions(useFavStore, ['toggleFavorite']),
         parseIcon(file) {
-            // 指到src || ..的意思是“回到上一層”
             return new URL(`../../assets/pic/product/${file}`, import.meta.url).href
         },
-        toogleFav(id) {
-            this.item.fav = !this.item.fav;
+        toggleFav(item) {
+            this.toggleFavorite(item)
         }
+    },
+    computed: {
+        ...mapGetters(useFavStore, ['isFavorite'])
     }
 }
 </script>
 
-<style lang="scss" scoped >
-.card-index {
+<style lang="scss" scoped>
+.card-single {
     width: 280px;
+
     .card-pic {
         position: relative;
         margin-bottom: 15px;
 
-        > img {
+        >img {
             width: 100%;
             border-radius: 20px;
             object-fit: cover;
@@ -81,7 +88,7 @@ export default {
         .card-tag {
             margin-bottom: 15px;
 
-            > span {
+            >span {
                 background-color: #fff;
                 border-radius: 15px;
                 padding: 2px 10px;

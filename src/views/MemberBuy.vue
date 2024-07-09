@@ -14,7 +14,7 @@
                 <div v-else class="display-window">
                     <div class="buy-card" v-for="item in displayData" :key="item.id" :item="item">
                         <button :class="{ open: isOpen === item.id , closed: isOpen !== item.id  }" type="button"
-                            @click="toggleContent(item.id)">{{ isOpen === item.id ? '取消訂單' : '訂單明細' }}</button>
+                            @click="toggleContent(item.id)">{{ isOpen === item.id ? '收合訂單' : '訂單明細' }}</button>
                         <ul class="buy-list">
                             <li class="order-id">
                                 <div>
