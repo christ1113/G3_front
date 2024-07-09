@@ -16,15 +16,15 @@
                 <form>
                     <div class="form-group">
                         <label for="name">姓名:</label>
-                        <input type="text" id="name">
+                        <input type="text" id="name" v-model="name">
                     </div>
                     <div class="form-group">
                         <label for="phone">聯繫電話：</label>
-                        <input type="text" id="phone">
+                        <input type="text" id="phone" v-model="phone">
                     </div>
                     <div class="form-group">
                         <label for="email">電子郵箱：</label>
-                        <input type="email" id="email">
+                        <input type="email" id="email" v-model="email">
                     </div>
                 </form>
             </div>
@@ -66,16 +66,16 @@
             <div class="disc-line"></div>
             <div class="receiver-info">
                 <span class="receiver">收件人資料</span>
-                <input type="checkbox"><span>同訂購人資料</span>
+                <input type="checkbox" id="checkbox" v-model="isChecked"><label for="checkbox" class="checkinfo">同訂購人資料</label>
             </div>
             <form>
                 <div class="form-group">
-                    <label for="name">收件人姓名:</label>
-                    <input type="text" id="name">
+                    <label for="name2" >收件人姓名:</label>
+                    <input type="text" id="name2" :value="isChecked ? name : ''" readonly>
                 </div>
                 <div class="form-group">
-                    <label for="phone">收件人聯絡電話：</label>
-                    <input type="text" id="phone">
+                    <label for="phone2">收件人聯絡電話：</label>
+                    <input type="text" id="phone2" :value="isChecked ? phone : ''" readonly>
                 </div>
                 <div class="form-group">
                     <label for="address">收件人地址：</label>
@@ -93,8 +93,8 @@
                     <input type="text" v-model="addressDetail" placeholder="請填寫詳細地址">
                 </div>
                 <div class="form-group">
-                    <label for="email">收件人電子郵箱：</label>
-                    <input type="email" id="email">
+                    <label for="email2">收件人電子郵箱：</label>
+                    <input type="email" id="email2" :value="isChecked ? email : ''" readonly>
                 </div>
                 <div class="form-group">
                     <label for="prefer-time">偏好收貨時間：</label>
@@ -198,13 +198,18 @@
     </div>
 </template>
 <script>
-    // 客製化圖片存儲地
+    // 客製化資料暫存
     import { useCustomizedStore } from '@/stores/customized.js'
     import{mapState}from 'pinia'
 
 export default {
     data() {
         return {
+            name: '',
+            phone: '',
+            emali: '',
+            isChecked: false,
+
             selectedCity: '',
             selectedDistrict: '',
             addressDetail: '',
@@ -234,6 +239,7 @@ export default {
         this.fetchCities();
     },
     methods: {
+        
         async fetchCities() {
             try {
                 const response = await fetch(`${import.meta.env.BASE_URL}Taiwan_address_data.json`);
@@ -251,7 +257,8 @@ export default {
         onTimeChange() {
             console.Consolelog('Selected time:', this.preferTime);
         }
-    }
+    },
+    
 };
 </script>
 <style scoped lang="scss">
@@ -355,12 +362,12 @@ export default {
                 object-fit: cover;
                 border-radius: 20px;
                 margin: auto 10px auto 0;
-                // img{
-                //     width: 100%;
-                //     height: 100%;
-                //     object-fit: cover;
-                //     vertical-align: middle;
-                // }
+                img{
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                    vertical-align: middle;
+                }
 
             }
 
@@ -422,7 +429,12 @@ export default {
 
             input {
                 margin: 0 10px 0 0;
+                cursor: pointer;
             }
+            .checkinfo{
+                cursor: pointer;
+            }
+            
 
         }
 

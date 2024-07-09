@@ -142,6 +142,9 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="txt">
+                            ( 點擊圖案兩下即可移除 )
+                        </div>
                         <div class="arrow">
                             <div class="next-arrow back" @click="currentStep--">
                                 <svg width="11" height="19" viewBox="0 0 11 19" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -231,7 +234,6 @@
 <script>
     import { useCustomizedStore } from '@/stores/customized.js'
     import{mapState,mapActions}from 'pinia'
-    import { useRouter } from 'vue-router'
 
     export default{
         data() {
@@ -273,8 +275,8 @@
                 picArrays: {
                     upload: [],
                     template: [
-                        { img: 'icon-2.png' },
-                        { img: 'icon-3.png' }
+                        { img: 'template-1.jpg' },
+                        { img: 'template-2.jpg' }
                     ],
                     icon: [
                         { img: 'icon-1.png' },
@@ -348,6 +350,7 @@
                 this.showBox2 = false;
                 this.smallPics[0].img = this.selectedImage
                 this.bigPic.img = this.selectedImage
+                this.customizedData.amount = 1
             },
 
             showGroup(group) {
@@ -386,19 +389,32 @@
                 const img = new Image();
                 img.onload = () => {
                     const aspectRatio = img.width / img.height;
-                    const desiredWidth = 200;  
-                    const desiredHeight = desiredWidth / aspectRatio;
+                    const isBackground = this.currentGroup === 'template';
+                    const canvasWidth = this.$refs.designCanvas.offsetWidth;
+                    const canvasHeight = this.$refs.designCanvas.offsetHeight;
+
+                    const desiredWidth = isBackground ? this.canvasWidth : 200;  
+                    const desiredHeight = isBackground ? canvasWidth / aspectRatio : desiredWidth / aspectRatio;
 
                     const newItem = {
                     src: image,
-                    top: 100,
-                    left: 100,
-                    width: desiredWidth,
-                    height: desiredHeight,
-                    scale: 1,
-                    zIndex: this.designItems.length + 1
+                    top: isBackground ? (canvasHeight- desiredHeight)/3 : 100,
+                    left: isBackground ? 0 : 100,
+                    width: isBackground ? canvasWidth : desiredWidth,
+                    height: isBackground ? canvasHeight : desiredHeight,
+                    scale: isBackground ? 1.2 : 1,
+                    zIndex: isBackground ? 0 : this.designItems.length + 1
                     };
-                    this.designItems.push(newItem);
+                    if(isBackground) {
+                        // 如果是背景圖片，替換掉現有的背景圖片
+                        if (this.designItems.length > 0 && this.designItems[0].zIndex === 0) {
+                            this.designItems[0] = newItem;
+                        } else {
+                            this.designItems.unshift(newItem);
+                        }
+                    } else {
+                        this.designItems.push(newItem);
+                    }
                     this.updatePreview();
                     this.saveToHistory();
                 };
@@ -441,7 +457,6 @@
                         };
                         img.src = item.src;
                     }));
-
                 // 加載圖片並返回 Promise
                 const loadImage = src => new Promise(resolve => {
                     const img = new Image();
@@ -490,7 +505,11 @@
                 this.initialMouseY = e.clientY;
                 this.initialItemLeft = item.left;
                 this.initialItemTop = item.top;
-                item.zIndex = Math.max(...this.designItems.map(i => i.zIndex)) + 1;
+                if(this.designItems[0]){
+                    item.zIndex = 0
+                } else {
+                    item.zIndex = Math.max(...this.designItems.map(i => i.zIndex)) + 1;
+                }
                 document.addEventListener('mousemove', this.moveItem);
                 document.addEventListener('mouseup', this.stopMoving);
             },
