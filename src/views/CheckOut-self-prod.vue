@@ -1,7 +1,8 @@
 <template>
     <div class="go-back">
         <router-link to="/customized">
-            <返回客製化頁面 </router-link>
+            返回客製化頁面 
+        </router-link>
     </div>
     <div class="checkout-container">
         <div class="confirm-info">
@@ -15,15 +16,15 @@
                 <form>
                     <div class="form-group">
                         <label for="name">姓名:</label>
-                        <input type="text" id="name">
+                        <input type="text" id="name" v-model="name">
                     </div>
                     <div class="form-group">
                         <label for="phone">聯繫電話：</label>
-                        <input type="text" id="phone">
+                        <input type="text" id="phone" v-model="phone">
                     </div>
                     <div class="form-group">
                         <label for="email">電子郵箱：</label>
-                        <input type="email" id="email">
+                        <input type="email" id="email" v-model="email">
                     </div>
                 </form>
             </div>
@@ -36,7 +37,7 @@
 
             <div class="prod-info">
                 <!-- <button><i class="fa-solid fa-chevron-down"></i></button> -->
-                <img class="prod-img" src="../assets/pic/um2.jpg" alt="客製化商品">
+                <img class="prod-img" :src="customizedData.img" alt="客製化商品">
                 <div class="prod-spec">
                     <div class="prod-card">
                         <h5>特製手工油紙傘</h5>
@@ -44,10 +45,10 @@
                         <div class="mention">*暫不支持超商取貨</div>
                     </div>
                     <div class="prod-count">
-                        數量：<span>1/隻</span>
+                        數量：<span>{{customizedData.amount}}/隻</span>
                     </div>
                     <div class="prod-sum">
-                        總計：NT$<span>999</span>
+                        總計：NT$<span>{{total}}</span>
                     </div>
                     <!-- <div class="prod-card">
                         <h5>數字精緻手工油紙傘</h5>
@@ -65,16 +66,16 @@
             <div class="disc-line"></div>
             <div class="receiver-info">
                 <span class="receiver">收件人資料</span>
-                <input type="checkbox"><span>同訂購人資料</span>
+                <input type="checkbox" id="checkbox" v-model="isChecked"><label for="checkbox" class="checkinfo">同訂購人資料</label>
             </div>
             <form>
                 <div class="form-group">
-                    <label for="name">收件人姓名:</label>
-                    <input type="text" id="name">
+                    <label for="name2" >收件人姓名:</label>
+                    <input type="text" id="name2" :value="isChecked ? name : ''" readonly>
                 </div>
                 <div class="form-group">
-                    <label for="phone">收件人聯絡電話：</label>
-                    <input type="text" id="phone">
+                    <label for="phone2">收件人聯絡電話：</label>
+                    <input type="text" id="phone2" :value="isChecked ? phone : ''" readonly>
                 </div>
                 <div class="form-group">
                     <label for="address">收件人地址：</label>
@@ -92,8 +93,8 @@
                     <input type="text" v-model="addressDetail" placeholder="請填寫詳細地址">
                 </div>
                 <div class="form-group">
-                    <label for="email">收件人電子郵箱：</label>
-                    <input type="email" id="email">
+                    <label for="email2">收件人電子郵箱：</label>
+                    <input type="email" id="email2" :value="isChecked ? email : ''" readonly>
                 </div>
                 <div class="form-group">
                     <label for="prefer-time">偏好收貨時間：</label>
@@ -188,7 +189,7 @@
             </div>
             <div class="disc-line"></div>
             <div class="invoice-total">
-                <p>總計：NT$999</p>
+                <p>總計：NT${{total}}</p>
             </div>
         </div>
         <div class="confirm-checkout">
@@ -197,9 +198,18 @@
     </div>
 </template>
 <script>
+    // 客製化資料暫存
+    import { useCustomizedStore } from '@/stores/customized.js'
+    import{mapState}from 'pinia'
+
 export default {
     data() {
         return {
+            name: '',
+            phone: '',
+            emali: '',
+            isChecked: false,
+
             selectedCity: '',
             selectedDistrict: '',
             addressDetail: '',
@@ -220,12 +230,16 @@ export default {
         },
         filteredDistricts() {
             return this.cities.filter(city => city.city_name == this.selectedCity);
-        }
+        },
+
+        // 引用客製化data , 總計
+        ...mapState(useCustomizedStore,['customizedData','total']),
     },
     created() {
         this.fetchCities();
     },
     methods: {
+        
         async fetchCities() {
             try {
                 const response = await fetch(`${import.meta.env.BASE_URL}Taiwan_address_data.json`);
@@ -243,7 +257,8 @@ export default {
         onTimeChange() {
             console.Consolelog('Selected time:', this.preferTime);
         }
-    }
+    },
+    
 };
 </script>
 <style scoped lang="scss">
@@ -341,11 +356,18 @@ export default {
             }
 
             .prod-img {
-                height: auto;
+                background-color: #ffffff;
+                // height: auto;
                 width: 20%;
                 object-fit: cover;
                 border-radius: 20px;
                 margin: auto 10px auto 0;
+                img{
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                    vertical-align: middle;
+                }
 
             }
 
@@ -407,7 +429,12 @@ export default {
 
             input {
                 margin: 0 10px 0 0;
+                cursor: pointer;
             }
+            .checkinfo{
+                cursor: pointer;
+            }
+            
 
         }
 

@@ -33,7 +33,7 @@
         <div v-else class="product-loop">
             <swiper class="cardlist" :slides-per-view="'auto'" :space-between="25" @swiper="onSwiper"
                 @slideChange="onSlideChange" :navigation="true" :modules="modules" :centeredSlides="false" >
-                <swiper-slide v-for="item in displayData" :key="item.id">
+                <swiper-slide v-for="item in displayData" :key="item.prod_id">
                     <IndexProductCard :item="item" />
                 </swiper-slide>
             </swiper>
@@ -82,16 +82,31 @@ export default {
     //可以用create也可以用mounted
     // created() {
     mounted() {
-        fetch(`${import.meta.env.BASE_URL}products.json`)
-            .then(res => res.json())
+        const body = {
+            // 确保 body 定义并包含正确的数据
+        };
+
+        fetch(`http://localhost/g3_php/product.php`, {
+            method: "POST",
+            body: JSON.stringify(body)
+        })
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error('Network response was not ok ' + res.statusText);
+                }
+                return res.json();
+            })
             .then(json => {
                 // 確認有沒有response
                 console.log(json);
                 // 備份還原用
-                this.responseData = json
+                this.responseData = json["data"]["list"];
                 // 顯示用
-                this.displayData = json
+                this.displayData = json["data"]["list"];
             })
+            .catch(error => {
+                console.error('There has been a problem with your fetch operation:', error);
+            });
     },
     methods: {
         clear() {

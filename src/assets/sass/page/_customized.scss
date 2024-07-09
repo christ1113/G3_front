@@ -436,6 +436,9 @@
                             }
                         }
                     }
+                    .txt{
+                        color: #94150C;
+                    }
                     .arrow{
                         width: 100%;
                         display: flex;
@@ -554,6 +557,7 @@
                         width: 20%;
                         margin-right: 15px;
                         .pic{
+                            background-color: white;
                             width: 100%;
                             border: 1px solid #564A41;
                             border-radius: 20px;
@@ -571,11 +575,15 @@
                     }
                 }
                 .bigpic{
+                    width: 100%;
+                    height: 330px;
+                    background-color: white;
                     border: 1px solid #564A41;
                     border-radius: 20px;
                     overflow: hidden;
                     img{
                         width: 100%;
+                        height: 100%;
                         object-fit: cover;
                         vertical-align: middle; 
                     }
