@@ -275,19 +275,19 @@
                 picArrays: {
                     upload: [],
                     template: [
-                        { img: 'template-1.jpg' },
-                        { img: 'template-2.jpg' }
+                        // { img: 'template-1.jpg' },
+                        // { img: 'template-2.jpg' }
                     ],
                     icon: [
-                        { img: 'icon-1.png' },
-                        { img: 'icon-2.png' },
-                        { img: 'icon-3.png' },
-                        { img: 'icon-4.png' },
-                        { img: 'icon-5.png' },
-                        { img: 'icon-6.png' },
-                        { img: 'icon-7.png' },
-                        { img: 'icon-8.png' },
-                        { img: 'icon-9.png' }
+                        // { img: 'icon-1.png' },
+                        // { img: 'icon-2.png' },
+                        // { img: 'icon-3.png' },
+                        // { img: 'icon-4.png' },
+                        // { img: 'icon-5.png' },
+                        // { img: 'icon-6.png' },
+                        // { img: 'icon-7.png' },
+                        // { img: 'icon-8.png' },
+                        // { img: 'icon-9.png' }
                     ]
                 },
 
@@ -610,6 +610,42 @@
         },
         mounted() {
             
+            const body = {}; // 如果沒有特定的數據需要在請求正文中發送，可以保持空對象
+            fetch(`http://localhost/g3_php/customized.php`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(body)
+            })
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error('Network response was not ok ' + res.statusText);
+                }
+                return res.json();
+            })
+            .then(json => {
+                console.log(json); // 確認有沒有response
+                this.picArrays.icon = []; // 顯示用
+                json.data.icon.forEach(element => {
+                    this.picArrays.icon.push({
+                        img: element.icon_img
+                    })
+                });
+
+                this.picArrays.template = []; // 顯示用
+                json.data.template.forEach(element => {
+                    this.picArrays.template.push({
+                        img: element.tpl_img
+                    })
+                });
+                console.log(this.picArrays.template)
+            })
+            .catch(error => {
+                console.error('There has been a problem with your fetch operation:', error);
+            });
+
+
             document.addEventListener('click', this.handleClickOutside);
             document.addEventListener('mousemove', this.resize);
             document.addEventListener('mouseup', this.stopResize);
