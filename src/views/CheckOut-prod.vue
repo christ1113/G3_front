@@ -35,7 +35,7 @@
             <div class="disc-line"></div>
 
             <div class="prod-info">
-                <CheckoutProd v-for="item in selectedItems" :key="item.id" :item="item" />
+                <CheckoutProd v-for="item in selectedItems" :key="item.prod_id" :item="item" />
             </div>
             <div class="disc-line"></div>
             <div class="receiver-info">
@@ -241,7 +241,7 @@ export default {
             return this.cartStore.selectedCartItems.length;
         },
         totalPrice() {
-            return this.cartStore.selectedCartItems.reduce((acc, item) => acc + (item.count * item.price), 0);
+            return this.cartStore.selectedCartItems.reduce((acc, item) => acc + (item.count * item.prod_price), 0);
         },
         discountedTotal() {
             return Math.round(this.totalPrice * 0.8);
