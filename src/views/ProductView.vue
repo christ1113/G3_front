@@ -57,6 +57,7 @@
 
 <script>
 import ProductCard from '@/components/layout/ProductCard.vue'
+import {path} from '../../path.js'
 export default {
     components: {
         ProductCard
@@ -71,11 +72,12 @@ export default {
     //可以用create也可以用mounted
     // created() {
     mounted() {
+        let url = path + `product.php`
         const body = {
             // 确保 body 定义并包含正确的数据
         };
 
-        fetch(`http://localhost/g3_php/product.php`, {
+        fetch(url, {
             method: "POST",
             body: JSON.stringify(body)
         })

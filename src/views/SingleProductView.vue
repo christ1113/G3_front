@@ -90,6 +90,7 @@
 import ProductCard from '@/components/layout/ProductCard.vue'
 // 引入ProductCard和Pinia的useCartStore
 import { useCartStore } from '../stores/cartStore.js';
+// import { path } from '../../path.js';
 export default {
     components: {
         ProductCard
@@ -113,33 +114,41 @@ export default {
     },
     mounted() {
         this.fetchInfo();
-        const body = {
-            // 确保 body 定义并包含正确的数据
-        };
-
-        fetch(`http://localhost/g3_php/otherproduct.php`, {
-            method: "POST",
-            body: JSON.stringify(body)
-        })
-            .then(res => {
-                if (!res.ok) {
-                    throw new Error('Network response was not ok ' + res.statusText);
-                }
-                return res.json();
-            })
-            .then(json => {
-                // 確認有沒有response
-                console.log(json);
-                // 備份還原用
-                this.responseData = json["data"]["list"];
-                // 顯示用
-                this.displayData = json["data"]["list"];
-            })
-            .catch(error => {
-                console.error('There has been a problem with your fetch operation:', error);
-            });
+        this.fetchotherproduct();
     },
     methods: {
+        fetchotherproduct(){
+            // let url = path + 'otherproduct.php';
+            const body = {
+                // 确保 body 定义并包含正确的数据
+            };
+
+            fetch('/cid101/g3/api/otherproduct.php', {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(body)
+            })
+                .then(res => {
+                    if (!res.ok) {
+                        throw new Error('Network response was not ok ' + res.statusText);
+                    }
+                    return res.json();
+                })
+                .then(json => {
+                    // 確認有沒有response
+                    console.log('Response JSON:', json);
+
+                    // 備份還原用
+                    this.responseData = json["data"]["list"];
+                    // 顯示用
+                    this.displayData = json["data"]["list"];
+                })
+                .catch(error => {
+                    console.error('There has been a problem with your fetch operation:', error);
+                });
+        },
         fetchInfo() {
             // API
             fetch(`${import.meta.env.BASE_URL}products.json`)
