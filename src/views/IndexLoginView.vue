@@ -144,7 +144,7 @@ export default {
                 const auth2 = gapi.auth2.init({
                     client_id: '936842006999-iroeoumpffqet17pij6d53trmvvntkdm.apps.googleusercontent.com',
                     ux_mode: "redirect",
-                    redirect_uri: "http://localhost:5173/",
+                    redirect_uri: "https://tibamef2e.com/cid101/g3/front/memberinfo",
                 });
                 auth2.signIn().then(googleUser => {
                     const profile = googleUser.getBasicProfile();
