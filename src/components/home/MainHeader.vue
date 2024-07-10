@@ -39,7 +39,7 @@
                         <img class="mobile-user" src="../../assets/pic/mobile-user.svg" alt="會員登入/註冊">
                     </a>
                 </button>
-                <button class="member">王曉明
+                <button class="member">{{this.loginStore.userData.mem_name}}
                     <ul>
                         <router-link class="mem-info" to="/memberinfo">會員資訊</router-link>
                         <li class="sign-out" @click="signOut">登出</li>
@@ -117,6 +117,9 @@ export default {
                 const auth2 = gapi.auth2.getAuthInstance();
                 auth2.signOut().then(() => {
                     console.log('Google user signed out.');
+                    this.loginStore.emailData = ''
+                    this.loginStore.pswData = ''
+                    this.loginStore.userData = {}
                     this.loginStore.isLoggedIn = false; // 更新 Pinia 狀態
                     this.loginStore.currentUser = null; // 清除當前用戶信息
                     this.$router.push('/');

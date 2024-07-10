@@ -20,7 +20,7 @@
                             </div>
                             <div class="forget-login-btn">
                                 <button class="forget" @click="showContent('forget')">忘記密碼？</button>
-                                <button class="btn" @click="clickLogin">登入</button>
+                                <button class="btn" @click="clickLogin()">登入</button>
                             </div>
                             <p class="quick">使用以下帳號快速登入</p>
                             <div class="login-icon">
@@ -83,7 +83,7 @@
                             <button class="register-btn">註冊</button>
                         </div>
                     </div>
-                    <span class="x" @click="closeLoginInBtn">
+                    <span class="x" @click="closeLoginBox">
                         <img src="/src/assets/pic/login/ph_x-bold.png" alt="">
                     </span>
                 </div>
@@ -97,6 +97,7 @@ import { gapi } from 'gapi-script';
 import { useLoginStore } from '@/stores/loginStore';
 import { onMounted } from 'vue';
 import { useRouter } from 'vue-router';
+import {path} from "../../path.js"; //路徑
 
 export default {
     data() {
@@ -184,9 +185,45 @@ export default {
             googleLogIn
         };
     },
+
     methods: {
-        showContent(content) {
-            this.content = content;
+        // 登入判斷
+        async clickLogin() {
+            try {
+                let url = path + 'memberData.php';
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        account: this.loginStore.emailData,
+                        password: this.loginStore.pswData
+                    })
+                });
+                const data = await response.json();
+                if (data.code === 200) {
+                    alert(data.msg);
+                    // 成功登入
+                    this.closeLoginBox();
+                    document.querySelector(".member").style.display = "block";
+                    document.querySelector(".logIn-btn").style.display = "none";
+                    this.loginStore.setUserData(data.data.user);
+                    console.log(this.loginStore.userData)
+                    this.isLoggedIn = true;
+                    this.$router.push('/memberinfo'); 
+                } else {
+                    alert(data.msg);
+                    this.loginStore.emailData = ''
+                    this.loginStore.pswData = ''
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        },
+
+        showContent(e) {
+            this.content = e;
         },
         showLogin() {
             this.loginConsider = true;
@@ -232,6 +269,8 @@ export default {
             }
         },
     },
+
+    
 }
 </script>
 

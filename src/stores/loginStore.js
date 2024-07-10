@@ -1,8 +1,10 @@
 import { defineStore } from 'pinia';
 import { gapi } from 'gapi-script';
+// import {path} from "../../../path.js"; //路徑
 
 export const useLoginStore = defineStore('loginStore', {
     state: () => ({
+        userData:{},
         isLoggedIn: false,
         currentUser: null,
         emailData: '',
@@ -11,6 +13,9 @@ export const useLoginStore = defineStore('loginStore', {
         googleUser: null,
     }),
     actions: {
+        setUserData(userData) {
+            this.userData = userData;
+        },
         setEmailData(email) {
             this.emailData = email;
         },
@@ -23,6 +28,7 @@ export const useLoginStore = defineStore('loginStore', {
         memLogin() {
             const member = document.querySelector('.member');
             const logInBtn = document.querySelector('.logIn-btn');
+            
             if (this.emailData === this.mem[0].account && this.pswData === this.mem[0].psw) {
                 this.emailData = '';
                 this.pswData = '';
