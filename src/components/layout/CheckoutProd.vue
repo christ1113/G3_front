@@ -1,17 +1,17 @@
 <template>
     <div class="card" v-if="item">
       <div class="prod-detail">
-        <img class="prod" :src="getImageUrl(item.pic1)" :alt="item.name">
+        <img class="prod" :src="getImageUrl(item.prod_img1)" :alt="item.prod_name">
         <div class="prod-spec">
           <div class="info">
-            <h5>{{ item.name }}</h5>
-            <p>{{ item.tag }}</p>
+            <h5>{{ item.prod_name }}</h5>
+            <p>{{ item.prod_category }}</p>
           </div>
           <div class="amount">
             <p>數量：{{ item.count }}</p>
           </div>
           <div class="price">
-            <p>總計：NT${{ item.count * item.price }}</p>
+            <p>總計：NT${{ item.count * item.prod_price }}</p>
           </div>
         </div>
       </div>

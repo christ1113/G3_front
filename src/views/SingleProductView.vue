@@ -4,34 +4,34 @@
             <!-- {{ $route.params.id }} -->
             <div class="product-pic">
                 <div class="product-pic-lg">
-                    <img :src="currentLgPic" :alt="productInfo.name">
+                    <img :src="currentLgPic" :alt="productInfo.prod_name">
                 </div>
                 <div class="product-pic-sm">
-                    <img @click="changeLgPic(productInfo.pic1)" :src="parseIcon(productInfo.pic1)"
-                        :alt="productInfo.name">
-                    <img @click="changeLgPic(productInfo.pic2)" :src="parseIcon(productInfo.pic2)"
-                        :alt="productInfo.name">
-                    <img @click="changeLgPic(productInfo.pic3)" :src="parseIcon(productInfo.pic3)"
-                        :alt="productInfo.name">
+                    <img @click="changeLgPic(productInfo.prod_img1)" :src="parseIcon(productInfo.prod_img1)"
+                        :alt="productInfo.prod_name">
+                    <img @click="changeLgPic(productInfo.prod_img2)" :src="parseIcon(productInfo.prod_img2)"
+                        :alt="productInfo.prod_name">
+                    <img @click="changeLgPic(productInfo.prod_img3)" :src="parseIcon(productInfo.prod_img3)"
+                        :alt="productInfo.prod_name">
                 </div>
 
             </div>
             <div class="product-text">
 
                 <div class="product-title">
-                    {{ productInfo.name || '' }}
+                    {{ productInfo.prod_name || '' }}
                 </div>
                 <div class="product-tag">
-                    <span>{{ productInfo.tag || '' }}</span>
+                    <span>{{ productInfo.prod_category || '' }}</span>
                 </div>
                 <div class="product-rating">
-                    <span v-if="productInfo.rating !== undefined" v-for="star in Math.floor(productInfo.rating)"
-                        :key="star">
+                    <span v-if="productInfo.prod_rating !== undefined"
+                        v-for="star in Math.floor(productInfo.prod_rating)" :key="star">
                         🌟
                     </span>
                 </div>
                 <div class="product-price">
-                    NT${{ productInfo.price || '' }}
+                    NT${{ productInfo.prod_price || '' }}
                 </div>
                 <div class="product-count">
                     <p>數量</p>
@@ -66,7 +66,7 @@
                 <div class="product-space"></div>
                 <div class="product-info">
                     <p>商品介紹</p>
-                    <p>{{ productInfo.desc || '' }}</p>
+                    <p>{{ productInfo.prod_desc || '' }}</p>
                 </div>
             </div>
 
@@ -109,7 +109,7 @@ export default {
     watch: {
         "$route.params.id"() {
             this.fetchInfo();
-            this.quantity=1
+            this.quantity = 1
         },
     },
     mounted() {
@@ -117,7 +117,7 @@ export default {
         this.fetchotherproduct();
     },
     methods: {
-        fetchotherproduct(){
+        fetchotherproduct() {
             // let url = path + 'otherproduct.php';
             const body = {
                 // 确保 body 定义并包含正确的数据
@@ -150,22 +150,24 @@ export default {
                 });
         },
         fetchInfo() {
-            // API
-            fetch(`${import.meta.env.BASE_URL}products.json`)
+            fetch('/cid101/g3/api/product.php')
                 .then(res => res.json())
                 .then(json => {
-                    this.productInfo = json.find(item => {
-                        return item.id == this.$route.params.id
-                    })
-                    if (this.productInfo.pic1) {
-                        this.currentLgPic = this.parseIcon(this.productInfo.pic1); // 初始設置大圖片
+                    if (json.data && json.data.list) {
+                        this.productInfo = json.data.list.find(item => {
+                            return item.prod_id == this.$route.params.id;
+                        }) || {};
+                        if (this.productInfo.prod_img1) {
+                            this.currentLgPic = this.parseIcon(this.productInfo.prod_img1);
+                        }
+                        console.log(this.productInfo);
+                    } else {
+                        console.error('Unexpected data structure:', json);
                     }
-                    console.log(this.productInfo);
                 })
                 .catch((error) => {
-                    // 錯誤例外
                     console.log(`Error: ${error}`);
-                })
+                });
         },
         parseIcon(file) {
             // 指到src || ..的意思是“回到上一層”
