@@ -83,7 +83,8 @@
         <h5>{{ activity.act_name }}</h5>
       </div>
       <div class="card-date">{{ activity.act_date }}</div>
-      <div class="card-time">{{ activity.sess_time }}</div>
+      <div class="card-time">{{ getFirstSessionTime(activity.sess_time) }}</div>
+      <div class="card-time">{{ getSecondSessionTime(activity.sess_time) }}</div>
       <div class="card-loc"><img src="@/assets/pic/activity/map.png" alt="">{{ activity.act_loc }}</div>
       <div class="card-price">NT${{ activity.act_price }}</div>
     </div>
@@ -94,6 +95,7 @@
 <script>
 import 'v-calendar/style.css';
 import Datepicker from 'vue3-datepicker';
+import {path} from '../../path.js'
 
 export default {
   name: 'ActivityView',
@@ -175,6 +177,12 @@ export default {
     }
   },
   methods: {
+    getFirstSessionTime(sess_time) {
+      return sess_time.split('、')[0].trim();
+    },
+    getSecondSessionTime(sess_time) {
+      return sess_time.split('、')[1].trim();
+    },
     parseImg(file) {
       // 指到src || ..的意思是“回到上一層”
       return new URL(`../assets/pic/activity/${file}`, import.meta.url).href;

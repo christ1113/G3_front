@@ -221,6 +221,8 @@ export default {
 };
 </script>
 <style scoped lang="scss">
+@import "@/assets/sass/style";
+
 .go-back {
     width: 90%;
     margin: 20px auto;
@@ -610,8 +612,857 @@ export default {
         }
     }
 
+}
+@media screen and (min-width: $md) and (max-width: $xl) {
+    .checkout-container {
+        width: 80%;
+        margin: 50px auto;
+
+        .confirm-ord {
+
+            .confirm-ord-title {
+                height: 48px; //高的問題要解決
+                padding-left: 20px;
+                display: flex;
+                align-items: center;
+            }
+
+            .disc-line {
+                height: 1px;
+                background-color: #828282;
+            }
+
+            .prod-info {
+                display: block;
+                padding-left: 0px;
+                height: 30%;
+
+                .prod-img {
+                    height: auto;
+                    width: 20%;
+                    object-fit: cover;
+                    border-radius: 10px;
+                    margin: auto 10px auto 0;
+
+                }
+
+                .prod-spec {
+                    display: flex;
+                    margin: auto 0;
+                    width: 80%;
+                    justify-content: space-between;
+
+                    .prod-card {
+                        h5 {
+                            padding-bottom: 10px;
+                            font-size: 16px;
+                        }
+
+                        span {
+                            line-height: 150%;
+                            font-size: 14px;
+                        }
+
+                        .mention {
+                            font-size: 12px;
+                            padding-top: 50px;
+                        }
+
+                    }
+
+                    .prod-count {
+                        margin: auto;
+                    }
+
+                    .prod-sum {
+                        margin: auto;
+                    }
+
+                }
+            }
+
+            .receiver-info {
+                display: flex;
+                margin: 20px 0;
+                padding-left: 30px;
+                align-items: center;
+
+                .receiver {
+                    position: relative;
+                    margin-right: 80px;
+
+                    &::before {
+                        content: "";
+                        position: absolute;
+                        height: 18px;
+                        width: 2px;
+                        background-color: rgba(190, 26, 14, 1);
+                        left: -10px;
+                        bottom: 0;
+                        top: 0;
+                    }
+                }
+
+                input {
+                    margin: 0 10px 0 0;
+                }
+
+            }
+
+            form {
+                display: flex;
+                flex-direction: column;
+                margin-top: 40px;
+                gap: 25px;
+                padding-left: 20px;
+
+                .form-group {
+                    display: flex;
+                    align-items: flex-start;
+                    margin: auto 0;
+
+                    label {
+                        flex-basis: 25%;
+                        margin: auto 0;
+                        font-size: 14px;
+                    }
+
+                    input {
+                        height: 20px;
+                        flex-basis: 25%;
+                        font-size: 14px;
+                    }
+
+                    select {
+                        height: 26px;
+                        flex-basis: 10%;
+                        margin-right: 10px;
+                        background-color: rgba(249, 241, 229, 1);
+                    }
+
+                    .large-textarea {
+                        height: 80px;
+                        flex-basis: 25%;
+                        resize: vertical;
+                        /* 允許垂直調整大小 */
+
+                    }
+
+
+                }
+
+            }
+
+            .disc-line-form {
+                margin-top: 20px;
+                height: 1px;
+                background-color: #828282;
+            }
+
+            .invoicing-title {
+                display: flex;
+                margin: 20px 0;
+                padding-left: 30px;
+                position: relative;
+
+                &::before {
+                    content: "";
+                    position: absolute;
+                    height: 18px;
+                    width: 2px;
+                    background-color: rgba(190, 26, 14, 1);
+                    left: 20px;
+                    bottom: 0;
+                    top: 0;
+                }
+            }
+
+            .invoicing-form {
+                display: flex;
+                flex-direction: column;
+                margin-top: 40px;
+                gap: 25px;
+                padding-left: 20px;
+
+                .form-group {
+                    display: flex;
+                    align-items: flex-start;
+                    margin: auto 0;
+
+                    label {
+                        flex-basis: 25%;
+                        margin: auto 0;
+                        font-size: 14px;
+                    }
+
+                    input {
+                        height: 20px;
+                        flex-basis: 0;
+
+                    }
+
+                    .invoicing-cb {
+                        width: 13px;
+                        height: 13px;
+                        margin: auto 10px auto 30px;
+                    }
+
+                    span {
+                        display: inline-block;
+                        margin: auto 0;
+                        font-size: 14px;
+                    }
+                }
+            }
+
+        }
+
+        .pay-way {
+            border: 1px solid #828282;
+            background: #ffffff;
+            border-radius: 20px;
+            height: 290px;
+
+            .payment-title {
+                height: 48px;
+                padding-left: 20px;
+                display: flex;
+                align-items: center;
+            }
+
+            .disc-line {
+                height: 1px;
+                background-color: #828282;
+            }
+
+            .payment-info {
+                height: 82%;
+                display: flex;
+                align-items: center;
+                padding-left: 20px;
+
+                form {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 25px;
+                    width: 100%;
+                    margin: auto 0;
+
+                    .form-group {
+                        display: flex;
+                        align-items: flex-start;
+                        margin: auto 0;
+
+                        input[type="radio"] {
+                            margin-right: 10px;
+                            accent-color: #be1a0e;
+                        }
+
+                        label {
+                            flex-basis: 25%;
+                            margin: auto 0;
+                            font-size: 14px;
+                        }
+
+                        .card-input {
+                            display: flex;
+                            width: 30px;
+                            flex-basis: 10%;
+                        }
+
+                        span {
+                            display: inline-block;
+                            padding: 0 3px;
+                            margin: auto 0;
+                        }
+
+                        input[type="text"] {
+                            height: 20px;
+                            font-size: 14px;
+                        }
+
+                        #expiry-date-mm {
+                            display: flex;
+                            width: 30px;
+                            flex-basis: 10%;
+                        }
+
+                        #expiry-date-yy {
+                            display: flex;
+                            width: 30px;
+                            flex-basis: 10%;
+
+                        }
+
+                        #cvc {
+                            margin-left: 14px;
+                            width: 50px;
+                            flex-basis: 20%;
+
+                        }
+
+                        .save-card-use {
+                            display: flex;
+                            align-items: center;
+
+                            input {
+                                margin: 0px;
+                            }
+
+                            label {
+                                flex-basis: 100%;
+                                padding-left: 10px;
+                            }
+                        }
+
+                        .switch {
+                            appearance: none;
+                            width: 40px;
+                            height: 20px;
+                            background: #ddd;
+                            border-radius: 10px;
+                            position: relative;
+                            cursor: pointer;
+                            outline: none;
+                            transition: background 0.3s;
+
+                            &:checked {
+                                background: #4caf50;
+                            }
+
+                            &::before {
+                                content: '';
+                                position: absolute;
+                                width: 18px;
+                                height: 18px;
+                                background: #fff;
+                                border-radius: 50%;
+                                top: 1px;
+                                left: 1px;
+                                transition: transform 0.3s;
+                            }
+
+                            &:checked::before {
+                                transform: translateX(20px);
+                            }
+                        }
+
+                        .switch-alert {
+                            color: #be1a0e;
+                            font-size: 12px;
+                            padding-left: 20px;
+                        }
+                    }
+                }
+            }
+        }
+
+        .invoice {
+            border: 1px solid #828282;
+            background: #ffffff;
+            border-radius: 20px;
+            margin: 40px 0;
+
+            .invoice-item {
+                margin: auto;
+                padding: 30px 0 10px 0;
+
+                .item-description {
+                    text-align:left;                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    margin-bottom: 20px;
+
+                    p {
+                        margin: 5px 0;
+                    }
+
+                    .item-total {
+                        margin: 0 10px;
+                        width: 33.33%;
+                    }
+
+                    .useCoupon {
+                        display: flex;
+                        justify-content: space-around;
+                        width: 66.66%;
+                        margin: auto;
+
+                        .item-multiplication {
+                            margin: 0 10px;
+                            width: 50%;
+                        }
+
+                        .item-discount {
+                            margin: 0 10px;
+                            width: 50%;
+                        }
+                    }
+
+
+                }
 
 
 
+
+                .disc-line {
+                    height: 1px;
+                    background-color: #828282;
+                }
+
+            }
+
+
+
+            .invoice-total {
+                margin: auto 40px;
+                text-align: right;
+                padding: 20px 0;
+                font-weight: 600;
+            }
+
+        }
+
+        .confirm-checkout {
+
+            button {
+                background-color: transparent;
+                border: none;
+                background: #be1a0e;
+                border-radius: 20px;
+                width: 130px;
+                height: 50px;
+                color: #ffffff;
+                font-size: 16px;
+                cursor: pointer;
+            }
+        }
+
+
+
+
+    }
+}
+
+@media screen and (max-width: $md) {
+    .go-back {
+        font-size: 14px;
+    }
+
+    .checkout-container {
+        width: 80%;
+        margin: 50px auto;
+
+        .confirm-info {
+            border: 1px solid #828282;
+            background: #ffffff;
+            border-radius: 20px;
+            height: 240px;
+
+            .confirm-title {
+                height: 48px;
+                padding-left: 20px;
+                display: flex;
+                align-items: center;
+                font-size: 14px;
+
+            }
+
+            .ord-info {
+                height: 80%;
+                display: flex;
+                align-items: center;
+                padding-left: 20px;
+
+                form {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 25px;
+                    width: 100%;
+
+                    .form-group {
+                        display: flex;
+                        align-items: flex-start;
+                        margin: auto 0;
+
+                        label {
+                            flex-basis: 40%;
+                            margin: auto 0;
+                            font-size: 14px;
+                        }
+
+                        input {
+                            height: 20px;
+                            flex-basis: 20%;
+                        }
+                    }
+                }
+            }
+        }
+
+        .confirm-ord {
+            border: 1px solid #828282;
+            background: #ffffff;
+            border-radius: 20px;
+            margin: 40px 0;
+            padding-bottom: 150px;
+
+            .confirm-ord-title {
+                font-size: 14px;
+            }
+
+            .receiver-info {
+                font-size: 14px;
+
+                .receiver {
+                    position: relative;
+                    margin-right: 80px;
+
+                    &::before {
+                        content: "";
+                        position: absolute;
+                        height: 16px;
+                        width: 2px;
+                        background-color: rgba(190, 26, 14, 1);
+                        left: -10px;
+                        bottom: 0;
+                        top: 0;
+                    }
+                }
+
+                input {
+                    margin: 0 10px 0 0;
+                }
+
+            }
+
+            form {
+                display: flex;
+                flex-direction: column;
+                margin-top: 40px;
+                gap: 25px;
+                padding-left: 20px;
+                font-size: 14px;
+
+                #address-form {
+                    select {
+                        height: 26px;
+                        flex-basis: auto;
+                        margin-right: 10px;
+                        background-color: rgba(249, 241, 229, 1);
+                        margin: 0 10px 10px 0;
+                    }
+                }
+
+                .form-group {
+                    display: flex;
+                    align-items: flex-start;
+                    margin: auto 0;
+                    flex-wrap: wrap;
+
+                    label {
+                        flex-basis: 40%;
+                        margin: auto 0;
+                        font-size: 14px;
+
+                    }
+
+                    input {
+                        height: 20px;
+                        flex-basis: 20%;
+                    }
+
+
+                    .large-textarea {
+                        height: 80px;
+                        flex-basis: 50%;
+                        resize: vertical;
+                        /* 允許垂直調整大小 */
+
+                    }
+
+
+                }
+
+            }
+
+            .invoicing-title {
+                display: flex;
+                margin: 20px 0;
+                padding-left: 30px;
+                position: relative;
+                font-size: 14px;
+
+                &::before {
+                    content: "";
+                    position: absolute;
+                    height: 16px;
+                    width: 2px;
+                    background-color: rgba(190, 26, 14, 1);
+                    left: 20px;
+                    bottom: 0;
+                    top: 0;
+                }
+            }
+
+            .invoicing-form {
+                display: flex;
+                flex-direction: column;
+                margin: 40px 0 20px 0;
+                gap: 25px;
+                padding-left: 20px;
+
+                .form-group {
+                    display: flex;
+                    align-items: flex-start;
+                    margin: auto 0;
+
+                    label {
+                        flex-basis: 40%;
+                        margin: auto 0;
+                        font-size: 14px;
+
+                    }
+
+                    input {
+                        height: 20px;
+                        flex-basis: 20%;
+                    }
+
+                    .invoicing-cb {
+                        margin: 10px 0;
+                        flex-basis: 20%;
+
+                    }
+
+                    span {
+                        display: flex;
+                        margin: auto 0;
+                    }
+
+                }
+            }
+
+        }
+
+        .pay-way {
+            border: 1px solid #828282;
+            background: #ffffff;
+            border-radius: 20px;
+            height: 290px;
+            font-size: 14px;
+
+            .payment-title {
+                height: 48px;
+                padding-left: 20px;
+                display: flex;
+                align-items: center;
+            }
+
+            .payment-info {
+                height: 82%;
+                display: flex;
+                align-items: center;
+                padding-left: 20px;
+                padding-right: 20px;
+
+                form {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 25px;
+                    width: 100%;
+                    margin: auto 0;
+
+                    .form-group {
+                        display: flex;
+                        align-items: flex-start;
+                        margin: auto 0;
+
+
+                        label {
+                            flex-basis: 40%;
+                            margin: auto 0;
+                            font-size: 14px;
+                        }
+
+                        .card-input {
+                            display: flex;
+                            width: 30px;
+                            flex-basis: 10%;
+                        }
+
+                        span {
+                            display: inline-block;
+                            padding: 0 3px;
+                            margin: auto 0;
+                        }
+
+                        input[type="text"] {
+                            height: 20px;
+                            font-size: 14px;
+                        }
+
+                        input::placeholder {
+                            font-size: 12px;
+                            /* 調整為你需要的字體大小 */
+                        }
+
+                        #expiry-date-mm {
+                            display: flex;
+                            width: 30px;
+                            flex-basis: 10%;
+                        }
+
+                        #expiry-date-yy {
+                            display: flex;
+                            width: 30px;
+                            flex-basis: 10%;
+
+                        }
+
+                        #cvc {
+                            margin-left: 14px;
+                            width: 50px;
+                            flex-basis: 35%;
+
+                        }
+
+                        .save-card-use {
+                            display: flex;
+                            align-items: center;
+
+                            input {
+                                margin: 0px;
+                            }
+
+                            label {
+                                flex-basis: 100%;
+                                padding-left: 10px;
+                            }
+                        }
+
+                        .switch {
+                            appearance: none;
+                            width: 40px;
+                            height: 20px;
+                            background: #ddd;
+                            border-radius: 10px;
+                            position: relative;
+                            cursor: pointer;
+                            outline: none;
+                            transition: background 0.3s;
+
+                            &:checked {
+                                background: #4caf50;
+                            }
+
+                            &::before {
+                                content: '';
+                                position: absolute;
+                                width: 18px;
+                                height: 18px;
+                                background: #fff;
+                                border-radius: 50%;
+                                top: 1px;
+                                left: 1px;
+                                transition: transform 0.3s;
+                            }
+
+                            &:checked::before {
+                                transform: translateX(20px);
+                            }
+                        }
+
+                        .switch-alert {
+                            color: #be1a0e;
+                            font-size: 12px;
+                            padding-left: 20px;
+                        }
+                    }
+                }
+            }
+        }
+
+        .invoice {
+            border: 1px solid #828282;
+            background: #ffffff;
+            border-radius: 20px;
+            margin: 40px 0;
+
+            .invoice-item {
+                margin: auto;
+                padding: 30px 0 10px 0;
+
+                .item-description {
+                    text-align:left;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    margin-bottom: 20px;
+
+                    p {
+                        margin: 5px 0;
+                        font-size: 14px;
+                    }
+
+                    .item-total {
+                        margin: 0 10px;
+                        width: 33.33%;
+
+                    }
+
+                    .useCoupon {
+                        display: flex;
+                        justify-content: space-around;
+                        width: 66.66%;
+                        margin: auto;
+
+                        .item-multiplication {
+                            margin: 0 10px;
+                            width: 50%;
+                        }
+
+                        .item-discount {
+                            margin: 0 10px;
+                            width: 50%;
+                        }
+                    }
+
+
+                }
+
+            }
+
+
+
+            .invoice-total {
+                margin: auto 40px;
+                text-align: right;
+                padding: 20px 0;
+                font-weight: 600;
+                font-size: 14px;
+            }
+
+        }
+
+        .confirm-checkout {
+
+            button {
+                background-color: transparent;
+                border: none;
+                background: #be1a0e;
+                border-radius: 20px;
+                width: 120px;
+                height: 46px;
+                color: #ffffff;
+                font-size: 14px;
+                cursor: pointer;
+            }
+        }
+
+
+
+
+    }
 }
 </style>
