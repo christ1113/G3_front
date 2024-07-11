@@ -138,7 +138,7 @@
                             <div class="pic-back">
                                 <div class="pic">
                                     <img :src="selectedImage" v-if="designItems.length > 0">
-                                    <img src="/src/assets/pic/customized/Preview.png" alt=""  v-else="!designItems">
+                                    <img :src="parseIcon(preview.img)" alt=""  v-else="!designItems">
                                 </div>
                             </div>
                         </div>
@@ -234,7 +234,6 @@
 <script>
     import { useCustomizedStore } from '@/stores/customized.js'
     import{mapState,mapActions}from 'pinia'
-    import {path} from "../../path.js"; //路徑
 
     export default{
         data() {
@@ -273,6 +272,9 @@
                 initialItemLeft: 0,
                 initialItemTop: 0,
                 initialScale: 1,
+                preview:{
+                    img: 'Preview.png'
+                },
                 picArrays: {
                     upload: [],
                     template: [
@@ -475,8 +477,8 @@
                 // 當所有設計元素都繪製完成後，進行最終的混合
                 Promise.all(drawPromises).then(() => {
                     Promise.all([
-                        loadImage(parseIcon('Preview.png')), // 替換為實際的背景圖路徑
-                        loadImage(parseIcon('Preview.png'))  // 替換為實際的遮色片圖路徑
+                        loadImage(this.parseIcon(this.preview.img)), // 替換為實際的背景圖路徑
+                        loadImage(this.parseIcon(this.preview.img))  // 替換為實際的遮色片圖路徑
                     ]).then(([backgroundImage, clipImage]) => {
                         // 在 finalCanvas 上繪製背景
                         finalCtx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
@@ -611,9 +613,8 @@
         },
         mounted() {
             
-            const body = {}; 
-            let url = path + 'customized.php';
-            fetch(url, {
+            const body = {}; // 如果沒有特定的數據需要在請求正文中發送，可以保持空對象
+            fetch(`http://localhost/g3_php/customized.php`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -641,7 +642,6 @@
                         img: element.tpl_img
                     })
                 });
-                console.log(this.picArrays.icon)
                 console.log(this.picArrays.template)
             })
             .catch(error => {
