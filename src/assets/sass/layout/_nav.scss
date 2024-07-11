@@ -285,6 +285,7 @@ header {
 
             @media (max-width: 996px) {
                 color: #FFFFFF;
+                pointer-events: none;
             }
 
             ul {
@@ -311,7 +312,9 @@ header {
             &.member:hover>ul {
                 display: block;
             }
+
         }
+
     }
 
     @keyframes slideIn {

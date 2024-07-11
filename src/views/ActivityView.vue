@@ -56,21 +56,9 @@
           </div>
           <h5>活動日期</h5>
           <div class="filter-date">
-            <div class="choose-date">
-              <p>日期選擇</p>
-            </div>
-            <v-date-picker v-model="range" color="red" is-range title-position="left">
-          <template v-slot="{ inputValue, inputEvents }">
-            <div class="vcalendar">
-              <input class="input-date" :value="inputValue.start" v-on="inputEvents.start" placeholder="開始日期"/>
-              <div class="icon">
-                <h4>~</h4>
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="0" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-              </div>
-              <input class="input-date" :value="inputValue.end" v-on="inputEvents.end" placeholder="結束日期"/>
-            </div>
-          </template>
-        </v-date-picker>
+            <div class="datepicker"><datepicker v-model="range.start" format="yyyy-MM-dd" placeholder="開始日期" @change="applyFilters" :style="{ width:'100%', color: '#564A41', textAlign:'center', fontSize:'16px', borderRadius: '5px', padding: '10px 0px', border: '1px solid #A9A8A8' }"></datepicker></div>
+            <div>~</div>
+            <div class="datepicker"><datepicker v-model="range.end" format="yyyy-MM-dd" placeholder="結束日期" @change="applyFilters" :style="{ width:'100%', color: '#564A41', textAlign:'center', fontSize:'16px', borderRadius: '5px', padding: '10px 0px', border: '1px solid #A9A8A8' }"></datepicker></div>
           </div>
           <hr>
           <div class="filter-result">
@@ -105,10 +93,13 @@
 
 <script>
 import 'v-calendar/style.css';
-
+import Datepicker from 'vue3-datepicker';
 
 export default {
   name: 'ActivityView',
+  components: {
+    Datepicker
+  },
   data() {
     return {
       activities: [],
@@ -131,54 +122,54 @@ export default {
   //     .then(data => {
   //       this.activities = data;
   //       this.responseData = data;
-        
+
   //     })
   //     .catch(error => console.error('Error fetching activities:', error));
   mounted() {
-        const body = {
-            // 確保身體定義並包含正確的數據
-        };
+    const body = {
+      // 確保身體定義並包含正確的數據
+    };
 
-        fetch(`http://localhost/G3_php/activity.php`, {
-            method: "POST",
-            body: JSON.stringify(body)
-        })
-            .then(res => {
-                if (!res.ok) {
-                    throw new Error('Network response was not ok ' + res.statusText);
-                }
-                return res.json();
-            })
-            .then(json => {
-                // 確認有沒有response
-                console.log(json);
-                this.responseData = json["data"]["list"];
-                this.activities = json["data"]["list"];
-                console.log(this.activities);
-            })
-            .catch(error => {
-                console.error('There has been a problem with your fetch operation:', error);
-            });
+    fetch(`http://localhost/G3_php/activity.php`, {
+      method: "POST",
+      body: JSON.stringify(body)
+    })
+      .then(res => {
+        if (!res.ok) {
+          throw new Error('Network response was not ok ' + res.statusText);
+        }
+        return res.json();
+      })
+      .then(json => {
+        // 確認有沒有response
+        console.log(json);
+        this.responseData = json["data"]["list"];
+        this.activities = json["data"]["list"];
+        console.log(this.activities);
+      })
+      .catch(error => {
+        console.error('There has been a problem with your fetch operation:', error);
+      });
   },
   computed: {
-    
+
     filteredActivities() {
       if (this.filterPending) {
-      // 對 activities 數據進行篩選
-      return this.activities.filter(activity => {
-        // 檢查活動的狀態是否匹配當前篩選條件
-        const matchesStatus = this.currentStatus === '全部' || activity.act_status === this.currentStatus;
-        // 檢查活動的類型是否匹配當前篩選條件
-        const matchesType = this.currentType === '全部' || activity.act_type === this.currentType;
-        // 檢查活動的地點是否匹配當前篩選條件
-        const matchesLoc = this.currentLoc === '' || activity.act_loc === this.currentLoc;        
-        const matchesDate = !this.range.start || !this.range.end || 
+        // 對 activities 數據進行篩選
+        return this.activities.filter(activity => {
+          // 檢查活動的狀態是否匹配當前篩選條件
+          const matchesStatus = this.currentStatus === '全部' || activity.act_status === this.currentStatus;
+          // 檢查活動的類型是否匹配當前篩選條件
+          const matchesType = this.currentType === '全部' || activity.act_type === this.currentType;
+          // 檢查活動的地點是否匹配當前篩選條件
+          const matchesLoc = this.currentLoc === '' || activity.act_loc === this.currentLoc;
+          const matchesDate = !this.range.start || !this.range.end ||
             (new Date(activity.act_date) >= new Date(this.range.start) && new Date(activity.act_date) <= new Date(this.range.end));
-        // 檢查活動的標題是否包含搜索關鍵字
-        const matchesSearch = activity.act_name.includes(this.search);
-        // 只有當活動同時滿足狀態、類型和搜索條件時，才會被篩選出來
-        return matchesStatus && matchesType && matchesSearch && matchesLoc && matchesDate;
-      });
+          // 檢查活動的標題是否包含搜索關鍵字
+          const matchesSearch = activity.act_name.includes(this.search);
+          // 只有當活動同時滿足狀態、類型和搜索條件時，才會被篩選出來
+          return matchesStatus && matchesType && matchesSearch && matchesLoc && matchesDate;
+        });
       }
       return this.activities; // 初始返回所有活動
     }
@@ -228,16 +219,22 @@ export default {
       this.filterPending = true;
     },
     applyFilters() {
+      if (this.range.end && this.range.start && new Date(this.range.end) < new Date(this.range.start)) {
+        alert("結束日期須大於開始日期");
+        return;
+      }
       this.filterPending = true;
       this.toggleFilterPopup();
-      this.range.start = null;
-      this.range.end = null;
+      // this.range.start = null;
+      // this.range.end = null;
     }
   }
 }
 </script>
 
 <style lang="scss" scoped>
+
+
 .filter-popup {
   position: fixed;
   top: 0;
@@ -282,9 +279,9 @@ export default {
       display: flex;
       gap: 30px;
 
-      .current-loc{
+      .current-loc {
         background-color: #BE1A0E;
-        
+
         >p {
           color: white;
         }
@@ -306,38 +303,34 @@ export default {
 
     .filter-date {
       display: flex;
-      justify-content: space-around;
-      align-self: center;
-      margin: 0 20px;
+      justify-content: space-evenly;
+      align-items: center;
 
-      .choose-date {
-        display: flex;
-        align-self: center;
-
+      .datepicker{
+        width: 40%;
       }
+      .v3dp__datepicker {
+    --popout-bg-color: var(--vdp-bg-color, #fff);
+    --text-color: var(--vdp-text-color, #564A41);
+    --border-radius: var(--vdp-border-radius, 5px);
+    --heading-size: var(--vdp-heading-size, 20px);
+    --heading-weight: var(--vdp-heading-weight, bold);
+    --heading-hover-color: var(--vdp-heading-hover-color, #eeeeee);
+    --arrow-color: var(--vdp-arrow-color, #564A41);
+    --elem-color: var(--vdp-elem-color, #564A41);
+    --elem-hover-color: var(--vdp-hover-color, #fff);
+    --elem-hover-bg-color: var(--vdp-hover-bg-color, #B1241A);
+    --elem-selected-color: var(--vdp-selected-color, #fff);
+    --elem-selected-bg-color: var(--vdp-selected-bg-color, #B1241A);
+    --elem-current-outline-color: var(--vdp-current-date-outline-color, none);
+    --elem-current-font-weight: var(--vdp-current-date-font-weight, none);
+    --elem-font-size: var(--vdp-elem-font-size, .8em);
+    --elem-border-radius: var(--vdp-elem-border-radius, 3px);
+    position: relative;
+}
 
-      .vcalendar {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-
-        .icon{
-          >h4{
-          margin: 0 5px;
-        }
-
-        }
-        
-
-        .input-date {
-          width: 100px;
-          padding: 10px 5px;
-          border-radius: 20px;
-          border: 1px solid #A9A8A8;
-          font-family: "Noto Serif HK", serif;
-          text-align: center;
-          cursor: pointer;
-        }
+      >div{
+        font-size: 20px;
       }
     }
 

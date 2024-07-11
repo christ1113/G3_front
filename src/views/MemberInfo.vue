@@ -21,10 +21,10 @@
                         </div>
                     </div>
                     <div class="content">
-                        <h5>使用者帳號 ： aaa123</h5>
+                        <h5>使用者帳號 ： {{this.loginStore.userData.mem_name}}</h5>
                         <h5>暱稱 ： <input type="text"></h5>
-                        <h5>信箱 ： aa****@gmail.com <a href="">變更</a></h5>
-                        <h5>電話 ： 0912****** <a href="">變更</a></h5>
+                        <h5>信箱 ： {{this.loginStore.userData.mem_email}} <a href="">變更</a></h5>
+                        <h5>電話 ： {{this.loginStore.userData.mem_tel}} <a href="">變更</a></h5>
                         <h5>性別 ： 
                             <input type="radio" id="gender-man" name="gender" value="man" checked />
                             <label for="gender-man">男性</label>
@@ -49,8 +49,28 @@
     </section>
 </template>
 
-<script setup>
+<script>
+import { useLoginStore } from '@/stores/loginStore';
 import MemberManageList from '../components/layout/MemberManageList.vue'
+
+export default{
+    data() {
+        return {
+            
+        }
+    },
+    components:{
+        MemberManageList
+    },
+    computed: {
+        loginStore() { 
+            return useLoginStore();
+        }
+    },
+}
+
+
+
 </script>
 
 <style lang="scss">

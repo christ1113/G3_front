@@ -1,11 +1,11 @@
 <template>
     <div class="card">
-        <input type="checkbox" v-model="localSelected" @change="emitToggleSelect" /> <!-- 使用 localSelected 來監聽 -->
-        <RouterLink :to="`/product/${item.id}`" class="prod-detail">
-            <img class="prod" :src="getImageUrl(item.pic1)" :alt="item.name">
+        <input type="checkbox" :checked="selected" @change="emitToggleSelect" /> <!-- 使用 localSelected 來監聽 -->
+        <RouterLink :to="`/product/${item.prod_id}`" class="prod-detail">
+            <img class="prod" :src="getImageUrl(item.prod_img1)" :alt="item.prod_name">
             <div class="info">
-                <h5>{{ item.name }}</h5>
-                <p>{{ item.tag }}</p>
+                <h5>{{ item.prod_name }}</h5>
+                <p>{{ item.prod_category }}</p>
             </div>
         </RouterLink>
         <div class="amount">
@@ -18,7 +18,7 @@
             <button @click="incrementQuantity"><i class="fa-solid fa-plus"></i></button>
         </div>
         <div class="price">
-            NT$<span>{{ item.price }}</span> <!-- 修改這行，顯示單價 -->
+            NT$<span>{{ item.prod_price }}</span> <!-- 修改這行，顯示單價 -->
         </div>
         <div class="delete">
             <button @click="removeItem"><img src="../../assets/pic/garbage-can.svg" alt="垃圾桶"></button>
@@ -44,20 +44,24 @@ export default {
     },
     methods: {
         emitToggleSelect() {
-            this.$emit('toggle-select', this.item.id, this.localSelected); // 發送事件通知父組件
+            this.$emit('toggle-select', this.item.prod_id, this.localSelected); // 發送事件通知父組件
         },
         incrementQuantity() {
             this.item.count += 1; // 使用 count 代替 quantity
-      this.$emit('update-quantity', this.item.id, this.item.count);  // 通知父組件更新數量
+            this.$emit('update-quantity', this.item.prod_id, this.item.count);  // 通知父組件更新數量
         },
         decrementQuantity() {
             if (this.item.count > 1) { // 使用 count 代替 quantity
-        this.item.count -= 1;
-        this.$emit('update-quantity', this.item.id, this.item.count);  // 通知父組件更新數量
+                this.item.count -= 1;
+                this.$emit('update-quantity', this.item.prod_id, this.item.count);  // 通知父組件更新數量
             }
         },
+        // removeItem() {
+        //     this.$emit('remove-item', this.item.prod_id); // 通知父組件移除項目
+        // },
         removeItem() {
-            this.$emit('remove-item', this.item.id); // 通知父組件移除項目
+            console.log( this.item.prod_id);
+            this.$emit('remove-item', this.item.prod_id);
         },
         getImageUrl,
     },
@@ -67,4 +71,3 @@ export default {
 <style scoped>
 /* ... existing styles ... */
 </style>
-  

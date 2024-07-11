@@ -15,8 +15,8 @@
 
     <div class="card-list">
       <div class="disc-line"></div>
-      <CartItem v-for="item in cartStore.cart" :key="item.id" :item="item"
-        :selected="cartStore.selectedItems.includes(item.id)" @update-quantity="updateQuantity"
+      <CartItem v-for="item in cartStore.cart" :key="item.prod_id" :item="item"
+        :selected="cartStore.selectedItems.includes(item.prod_id)" @update-quantity="updateQuantity"
         @remove-item="removeItem" @toggle-select="toggleSelect" />
       <div class="disc-line"></div>
     </div>
@@ -54,8 +54,8 @@ export default {
     },
     totalAmount() {
       return this.cartStore.cart.reduce((total, item) => {
-        if (this.cartStore.selectedItems.includes(item.id)) {
-          return total + item.price * item.count;
+        if (this.cartStore.selectedItems.includes(item.prod_id)) {
+          return total + item.prod_price * item.count;
         }
         return total;
       }, 0);
@@ -69,14 +69,15 @@ export default {
   },
   methods: {
     updateQuantity(id, quantity) {
-      const item = this.cartStore.cart.find(item => item.id === id);
+      const item = this.cartStore.cart.find(item => item.prod_id === id);
       if (item) {
         item.count = quantity;
         this.cartStore.addCart(item);
       }
     },
     removeItem(id) {
-      const item = this.cartStore.cart.find(item => item.id === id);
+      console.log(id)
+      const item = this.cartStore.cart.find(item => item.prod_id === id);
       this.cartStore.removeCart(item);
       this.cartStore.deselectItem(id);
     },
@@ -92,7 +93,7 @@ export default {
     },
     removeSelectedItems() {
       this.cartStore.selectedItems.forEach(id => {
-        const item = this.cartStore.cart.find(item => item.id === id);
+        const item = this.cartStore.cart.find(item => item.prod_id === id);
         this.cartStore.removeCart(item);
       });
       this.cartStore.clearSelectedItems();

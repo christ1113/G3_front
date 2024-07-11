@@ -44,7 +44,7 @@
 </template>
 
 <script>
-
+import {path} from '../../path.js'
 import IndexProductCard from '@/components/layout/IndexProductCard.vue'
 // Import Swiper Vue.js components
 import { Swiper, SwiperSlide } from 'swiper/vue';
@@ -82,11 +82,12 @@ export default {
     //可以用create也可以用mounted
     // created() {
     mounted() {
+        let url = path + 'product.php';
         const body = {
             // 确保 body 定义并包含正确的数据
         };
 
-        fetch(`http://localhost/g3_php/product.php`, {
+        fetch(url, {
             method: "POST",
             body: JSON.stringify(body)
         })

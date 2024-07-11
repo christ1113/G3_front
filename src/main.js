@@ -30,3 +30,8 @@ import 'v-calendar/style.css';
 
 // Use plugin with optional defaults
 app.use(VCalendar, {})
+
+import VueDatePicker from '@vuepic/vue-datepicker';
+import '@vuepic/vue-datepicker/dist/main.css'
+app.component('VueDatePicker', VueDatePicker);
+
