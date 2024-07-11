@@ -21,24 +21,24 @@
                         </div>
                     </div>
                     <div class="content">
-                        <h5>使用者帳號 ： {{this.loginStore.userData.mem_name}}</h5>
+                        <h5>使用者 ： {{this.loginStore.userData.mem_name}}</h5>
                         <h5>暱稱 ： <input type="text"></h5>
-                        <h5>信箱 ： {{this.loginStore.userData.mem_email}} <a href="">變更</a></h5>
-                        <h5>電話 ： {{this.loginStore.userData.mem_tel}} <a href="">變更</a></h5>
+                        <h5>信箱 ： {{this.loginStore.userData.mem_email}}</h5>
+                        <h5>電話 ： <input type="text" v-model="this.loginStore.userData.mem_tel"></h5>
                         <h5>性別 ： 
-                            <input type="radio" id="gender-man" name="gender" value="man" checked />
+                            <input type="radio" id="gender-man" name="gender" value="M" checked />
                             <label for="gender-man">男性</label>
-                            <input type="radio" id="gender-girl" name="gender" value="girl" />
+                            <input type="radio" id="gender-girl" name="gender" value="F" />
                             <label for="gender-girl">女性</label>
-                            <input type="radio" id="gender-else" name="gender" value="else" />
+                            <input type="radio" id="gender-else" name="gender" value="O" />
                             <label for="gender-else">其他</label>
                         </h5>
                         <h5>生日 ： 
-                            <input type="date" value="2000-06-19" min="1960-01-01" max="2006-12-31" />
+                            <input type="date" value="2000-06-19" v-model="this.loginStore.userData.mem_birth" />
                         </h5>
-                        <h5>地址 ： <input type="text"></h5>
-                        <h5>載具編號 ： <input type="text" value="/"></h5>
-                        <h5>統一編號 ： <input type="text"></h5>
+                        <h5>地址 ： <input type="text" v-model="this.loginStore.userData.mem_addr"></h5>
+                        <h5>載具編號 ： <input type="text" v-model="this.loginStore.userData.mem_carrier"></h5>
+                        <h5>統一編號 ： <input type="text" v-model="this.loginStore.userData.mem_company"></h5>
                     </div>
                     <button class="meminfo-btn">
                         儲存
@@ -56,7 +56,13 @@ import MemberManageList from '../components/layout/MemberManageList.vue'
 export default{
     data() {
         return {
-            
+
+        }
+    },
+    created() {
+        // 在組件創建時，如果 mem_carrier 沒有值，設置預設值為 '/'
+        if (!this.loginStore.userData.mem_carrier) {
+            this.loginStore.userData.mem_carrier = '/';
         }
     },
     components:{
