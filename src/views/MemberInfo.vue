@@ -63,7 +63,7 @@ export default{
         MemberManageList
     },
     computed: {
-        loginStore() { // 添加這段
+        loginStore() { 
             return useLoginStore();
         }
     },
