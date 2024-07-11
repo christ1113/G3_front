@@ -7,7 +7,6 @@
         <div class="confirm-info">
             <div class="confirm-title">
                 <span>確認訂購人資料</span>
-                <!-- <button><i class="fa-solid fa-chevron-down"></i></button> -->
             </div>
             <div class="disc-line"></div>
 
@@ -15,15 +14,19 @@
                 <form>
                     <div class="form-group">
                         <label for="name">姓名:</label>
-                        <input type="text" id="name">
+                        <!-- <input type="text" id="name" v-model="orderInfo.name" maxlength="50"> -->
+                        <input type="text" id="name" v-model="orderInfo.name" maxlength="50"
+                            :class="{ 'error-input': errors.name }">
+                        <div v-if="errors.name" class="error-message">{{ errors.name }}</div>
+
                     </div>
                     <div class="form-group">
                         <label for="phone">聯繫電話：</label>
-                        <input type="text" id="phone">
+                        <input type="text" id="phone" v-model="orderInfo.phone" maxlength="10">
                     </div>
                     <div class="form-group">
                         <label for="email">電子郵箱：</label>
-                        <input type="email" id="email">
+                        <input type="email" id="email" v-model="orderInfo.email" maxlength="255">
                     </div>
                 </form>
             </div>
@@ -40,35 +43,38 @@
             <div class="disc-line"></div>
             <div class="receiver-info">
                 <span class="receiver">收件人資料</span>
-                <input type="checkbox"><span>同訂購人資料</span>
+                <input type="checkbox" v-model="sameAsOrderInfo" @change="updateReceiverInfo"><span>同訂購人資料</span>
             </div>
             <form>
                 <div class="form-group">
                     <label for="name">收件人姓名:</label>
-                    <input type="text" id="name">
+                    <input type="text" id="name" maxlength="50" v-model="receiverInfo.name">
                 </div>
                 <div class="form-group">
                     <label for="phone">收件人聯絡電話：</label>
-                    <input type="text" id="phone">
+                    <input type="text" id="phone" v-model="receiverInfo.phone" maxlength="10">
                 </div>
                 <div class="form-group" id="address-form">
+
                     <label for="address">收件人地址：</label>
-                    <select v-model="selectedCity" @change="onCityChange" class="select">
-                        <option disabled value="">請選擇縣市</option>
-                        <option v-for="city in uniqueCities" :key="city" :value="city">{{ city }}</option>
-                    </select>
+                    <div class="address-group">
+                        <select v-model="selectedCity" @change="onCityChange" class="select">
+                            <option disabled value="">請選擇縣市</option>
+                            <option v-for="city in uniqueCities" :key="city" :value="city">{{ city }}</option>
+                        </select>
 
-                    <select v-model="selectedDistrict" class="select" :disabled="!selectedCity">
-                        <option disabled value="">請選擇鄉鎮區</option>
-                        <option v-for="district in filteredDistricts" :key="district.name" :value="district.name">{{
-                            district.name }}</option>
-                    </select>
+                        <select v-model="selectedDistrict" class="select" :disabled="!selectedCity">
+                            <option disabled value="">請選擇鄉鎮區</option>
+                            <option v-for="district in filteredDistricts" :key="district.name" :value="district.name">{{
+                                district.name }}</option>
+                        </select>
 
-                    <input type="text" v-model="addressDetail" placeholder="請填寫詳細地址">
+                        <input type="text" v-model="addressDetail" placeholder="請填寫詳細地址">
+                    </div>
                 </div>
                 <div class="form-group">
                     <label for="email">收件人電子郵箱：</label>
-                    <input type="email" id="email">
+                    <input type="email" id="email" v-model="receiverInfo.email" maxlength="255">
                 </div>
                 <div class="form-group">
                     <label for="prefer-time">偏好收貨時間：</label>
@@ -79,7 +85,6 @@
                 </div>
                 <div class="form-group">
                     <label for="text">特殊需求備註：</label>
-                    <!-- 特殊需求備註要改text格式 -->
                     <textarea id="memo" v-model="memo" maxlength="500" class="large-textarea"></textarea>
                 </div>
 
@@ -91,13 +96,23 @@
             <form class="invoicing-form">
                 <div class="form-group">
                     <label for="invoicing">載具編號：</label>
-                    <input type="text" id="invoicing" maxlength="8">
-                    <input type="checkbox" class="invoicing-cb"><span>設定為常用載具</span>
+                    <div class="invoicing-use">
+                        <input type="text" id="invoicing" maxlength="8">
+                        <div class="invoicing-often">
+                            <input type="checkbox" class="invoicing-cb">
+                            <span>設定為常用載具</span>
+                        </div>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label for="compilation-title">統一編號：</label>
-                    <input type="text" id="compilation" maxlength="8">
-                    <input type="checkbox" class="invoicing-cb"><span>設定為常用統編</span>
+                    <div class="invoicing-use">
+                        <input type="text" id="compilation" maxlength="8">
+                        <div class="invoicing-often">
+                            <input type="checkbox" class="invoicing-cb">
+                            <span>設定為常用統編</span>
+                        </div>
+                    </div>
                 </div>
             </form>
         </div>
@@ -184,25 +199,19 @@
 import { useCartStore } from '../stores/cartStore.js'
 import CheckoutProd from '../components/layout/CheckoutProd.vue'
 import SuccessModal from '../components/layout/SuccessModal.vue';
+import Swal from 'sweetalert2';
 export default {
-    //     setup() {
-    //     const cartStore = useCartStore()
-
-    //     return {
-    //       cartStore,
-    //     }
-    //   },
     components: { CheckoutProd, SuccessModal },
     setup() {
         const cartStore = useCartStore();
 
         return {
             cartStore,
-            selectedItems: cartStore.selectedItems // 添加 selectedItems
+            selectedItems: cartStore.selectedItems, // 添加 selectedItems
+            name: '',
         }
     },
     data() {
-
         return {
             cartStore: useCartStore(),
             selectedCity: '',
@@ -211,14 +220,37 @@ export default {
             preferTime: '',
             useCoupon: false,
             showSuccessModal: false,
-            order: {
+            orderInfo: {
+                name: '',
+                phone: '',
+                email: ''
+            },
+            receiverInfo: {
                 name: '',
                 phone: '',
                 email: '',
-                receiverName: '',
-                receiverPhone: '',
-                receiverEmail: '',
-                invoiceNumber: '',
+                address: {
+                    city: '',
+                    district: '',
+                    detail: ''
+                },
+                preferTime: ''
+            },
+            creditCard: {
+                number1: '',
+                number2: '',
+                number3: '',
+                number4: '',
+                expiryMonth: '',
+                expiryYear: '',
+                cvc: ''
+            },
+            errors: {},
+            sameAsOrderInfo: false,
+            originalReceiverInfo: {
+                name: '',
+                phone: '',
+                email: ''
             },
             times: [
                 { name: '無偏好' },
@@ -266,25 +298,20 @@ export default {
                 console.error('無法選取資料:', error);
             }
         },
+
         onCityChange() {
             this.selectDistrict = '';
         },
         onTimeChange() {
             console.Consolelog('Selected time:', this.preferTime);
         },
-        submitOrder() {
-            // 表单驗證
-            // if (!this.order.name || !this.order.phone || !this.order.email || !this.order.receiverName || !this.order.receiverPhone || !this.order.receiverEmail || !this.addressDetail) {
-            //     alert('請填寫並確認完成所有訂單資料');
-            //     return;
-            // }
+        // submitOrder() {
+        //     // 顯示成功彈窗
+        //     this.showSuccessModal = true;
 
-            // 顯示成功彈窗
-            this.showSuccessModal = true;
-
-            // 清空購物車
-            this.cartStore.cleanCart();
-        },
+        //     // 清空購物車
+        //     this.cartStore.cleanCart();
+        // },
         closeModal() {
             this.showSuccessModal = false;
             // 重定向到首頁
@@ -296,6 +323,68 @@ export default {
                     this.$refs[nextFieldId].focus();
                 }, 100);
             }
+        },
+        updateReceiverInfo() {
+            if (this.sameAsOrderInfo) {
+                // 儲存原始收件人資料
+                this.originalReceiverInfo = { ...this.receiverInfo };
+                // 更新收件人資料為訂購人資料
+                this.receiverInfo = { ...this.orderInfo };
+            } else {
+                // 取消勾選時，清空收件人資料
+                this.receiverInfo = {
+                    name: '',
+                    phone: '',
+                    email: ''
+                };
+            }
+        },
+        validateForm() {
+            this.errors = {};
+            if (!this.orderInfo.name) errors.push("請填寫訂購人姓名");
+            if (!this.orderInfo.phone) errors.push("請填寫訂購人正確格式聯繫電話(台灣電話10碼)");
+            if (!this.receiverInfo.name) errors.push("請填寫收件人姓名");
+            if (!this.receiverInfo.phone) errors.push("請填寫正確格式收件人聯絡電話(台灣電話10碼)");
+            if (!this.selectedCity || !this.selectedDistrict || !this.addressDetail) {
+                errors.push("請填寫完整的收件人地址");
+            }
+            if (!this.preferTime) errors.push("請選擇偏好收貨時間");
+            // 驗證信用卡資訊
+            const { number1, number2, number3, number4, expiryMonth, expiryYear, cvc } = this.creditCard;
+            if (!number1 || !number2 || !number3 || !number4) errors.push("請填寫完整的信用卡號碼");
+            if (!expiryMonth || !expiryYear) errors.push("請填寫信用卡有效日期");
+            if (!cvc) errors.push("請填寫信用卡背面的三碼");
+            return Object.keys(this.errors).length === 0;
+        },
+        async submitOrder() {
+            const errors = this.validateForm();
+            if (errors.length > 0) {
+                // 使用 SweetAlert2 顯示錯誤信息
+                await Swal.fire({
+                    icon: 'error',
+                    title: '表單驗證失敗',
+                    html: Object.values(this.errors).join('<br>')
+                });
+                return;
+            }
+            // 顯示成功彈窗
+            this.showSuccessModal = true;
+
+            // 清空購物車
+            this.cartStore.cleanCart();
+        }
+    },
+    watch: {
+        orderInfo: {
+            handler(newValue) {
+                if (this.sameAsOrderInfo) {
+                    this.receiverInfo = { ...newValue };
+                }
+            },
+            deep: true
+        },
+        sameAsOrderInfo(newValue) {
+            this.updateReceiverInfo();
         }
     }
 };
@@ -307,6 +396,15 @@ export default {
     width: 90%;
     margin: 20px auto;
 
+}
+
+.error-input {
+    border-color: red;
+}
+
+.error-message {
+    color: red;
+    font-size: 12px;
 }
 
 .checkout-container {
@@ -492,6 +590,7 @@ export default {
                 display: flex;
                 align-items: flex-start;
                 margin: auto 0;
+                flex-wrap: wrap;
 
                 label {
                     flex-basis: 20%;
@@ -504,15 +603,23 @@ export default {
 
                 }
 
-                .invoicing-cb {
-                    width: 13px;
-                    height: 13px;
-                    margin: auto 10px auto 30px;
-                }
+                .invoicing-use {
+                    display: flex;
+                    flex-wrap: wrap;
+                    align-items: center;
 
-                span {
-                    display: inline-block;
-                    margin: auto 0;
+                    .invoicing-often {
+                        .invoicing-cb {
+                            width: 13px;
+                            height: 13px;
+                            margin: auto 10px auto 30px;
+                        }
+
+                        span {
+                            display: inline-block;
+                            margin: auto 0;
+                        }
+                    }
                 }
             }
         }
@@ -710,8 +817,6 @@ export default {
 
         }
 
-
-
         .invoice-total {
             margin: auto 40px;
             text-align: right;
@@ -749,7 +854,34 @@ export default {
     .checkout-container {
         width: 80%;
         margin: 50px auto;
+        .confirm-info{
+        .ord-info {
+            font-size: 14px;
 
+            form {
+                display: flex;
+                flex-direction: column;
+                gap: 25px;
+                width: 100%;
+
+                .form-group {
+                    display: flex;
+                    align-items: flex-start;
+                    margin: auto 0;
+
+                    label {
+                        flex-basis: 25%;
+                        margin: auto 0;
+                    }
+
+                    input {
+                        height: 20px;
+                        flex-basis: 25%;
+                    }
+                }
+            }
+        }
+}
         .confirm-ord {
 
             .confirm-ord-title {
@@ -763,6 +895,8 @@ export default {
                 height: 1px;
                 background-color: #828282;
             }
+
+
 
             .prod-info {
                 display: block;
@@ -920,29 +1054,17 @@ export default {
                     display: flex;
                     align-items: flex-start;
                     margin: auto 0;
+                    font-size: 14px;
 
                     label {
                         flex-basis: 25%;
                         margin: auto 0;
-                        font-size: 14px;
                     }
 
                     input {
                         height: 20px;
                         flex-basis: 0;
 
-                    }
-
-                    .invoicing-cb {
-                        width: 13px;
-                        height: 13px;
-                        margin: auto 10px auto 30px;
-                    }
-
-                    span {
-                        display: inline-block;
-                        margin: auto 0;
-                        font-size: 14px;
                     }
                 }
             }
@@ -1276,12 +1398,22 @@ export default {
                 font-size: 14px;
 
                 #address-form {
-                    select {
-                        height: 26px;
-                        flex-basis: auto;
-                        margin-right: 10px;
-                        background-color: rgba(249, 241, 229, 1);
-                        margin: 0 10px 10px 0;
+                    display: flex;
+                    flex-wrap: wrap;
+                    align-items: center;
+
+                    .address-group {
+                        display: flex;
+                        flex-wrap: wrap;
+                        flex: 1;
+
+                        select {
+                            height: 26px;
+                            flex-basis: auto;
+                            margin-right: 10px;
+                            background-color: rgba(249, 241, 229, 1);
+                            margin: 0 10px 10px 0;
+                        }
                     }
                 }
 
@@ -1347,30 +1479,34 @@ export default {
                     display: flex;
                     align-items: flex-start;
                     margin: auto 0;
-
+                   
                     label {
                         flex-basis: 40%;
                         margin: auto 0;
                         font-size: 14px;
 
                     }
-
-                    input {
+                    .invoicing-use {
+                        display: flex;
+                        align-items: center;
+                        flex-wrap: wrap;
+                        margin-top: 10px;
+                        input {
                         height: 20px;
                         flex-basis: 20%;
                     }
+                        .invoicing-often {
+                            width: auto;
+                            .invoicing-cb{
+                                margin: 0 10px 0 20px;
+                            } 
 
-                    .invoicing-cb {
-                        margin: 10px 0;
-                        flex-basis: 20%;
-
+                            span {
+                                display: inline-block;
+                                margin: auto 0;
+                            }
+                        }
                     }
-
-                    span {
-                        display: flex;
-                        margin: auto 0;
-                    }
-
                 }
             }
 
@@ -1414,12 +1550,16 @@ export default {
                             flex-basis: 40%;
                             margin: auto 0;
                             font-size: 14px;
+                            flex-shrink: 0;
+                            flex-grow: 0;
                         }
 
                         .card-input {
                             display: flex;
                             width: 30px;
                             flex-basis: 10%;
+                            flex-shrink: 1;
+                            flex-grow: 1;
                         }
 
                         span {
