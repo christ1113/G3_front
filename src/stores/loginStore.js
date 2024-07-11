@@ -4,7 +4,9 @@ import { gapi } from 'gapi-script';
 
 export const useLoginStore = defineStore('loginStore', {
     state: () => ({
-        userData:{},
+        userData:{
+            mem_tel : ''
+        },
         isLoggedIn: false,
         currentUser: null,
         emailData: '',
@@ -15,6 +17,7 @@ export const useLoginStore = defineStore('loginStore', {
     actions: {
         setUserData(userData) {
             this.userData = userData;
+            this.userData.mem_tel = '0' + this.userData.mem_tel; // 電話 + 0
         },
         setEmailData(email) {
             this.emailData = email;

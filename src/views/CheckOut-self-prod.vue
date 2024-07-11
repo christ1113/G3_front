@@ -100,7 +100,7 @@
                     <label for="prefer-time">偏好收貨時間：</label>
                     <select v-model="preferTime" @change="onTimeChange" class="select">
                         <option disabled value="">請選擇時間段</option>
-                        <option v-for="time in times" :key="time.name" value="time.name">{{ time.name }}</option>
+                        <option v-for="time in times" :key="time.id" :value="time.id">{{ time.name }}</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -193,7 +193,7 @@
             </div>
         </div>
         <div class="confirm-checkout">
-            <button>確認結帳</button>
+            <button @click="submitOrder">確認結帳</button>
         </div>
     </div>
 </template>
@@ -204,28 +204,40 @@
     // 登入資料
     import { useLoginStore } from '@/stores/loginStore';
 
+    import {path} from "../../path.js"; //路徑
+
 export default {
     data() {
         return {
             name: '',
             phone: '',
-            emali: '',
+            email: '',
             isChecked: false,
             checkedCarrier: false,
             checkedCompany: false,
-            
-
             selectedCity: '',
             selectedDistrict: '',
             addressDetail: '',
             preferTime: '',
             times: [
-                { name: '無偏好' },
-                { name: '上午(9:00~12:00)' },
-                { name: '下午(13:00~18:00)' }
+                {
+                    id:0,
+                    name: '無偏好' 
+                },
+                { 
+                    id:1,
+                    name: '上午(9:00~12:00)' 
+                },
+                { 
+                    id:2,
+                    name: '下午(13:00~18:00)' 
+                }
             ],
             cities: [],
-            districts: []
+            districts: [],
+            memo: '',  // 添加備註
+            invoiceNum: '',  // 添加發票號碼
+            uniformNum: ''  // 添加統一編號
         };
     },
     computed: {
@@ -271,7 +283,52 @@ export default {
         },
         onTimeChange() {
             console.Consolelog('Selected time:', this.preferTime);
+        },
+
+        async submitOrder() {
+            const orderData = {
+                mem_id: this.loginStore.userData.mem_id,
+                ord_name: this.name,
+                ord_tel: this.phone,
+                ord_mail: this.email,
+                ord_date: new Date().toISOString().slice(0, 19).replace('T', ' '),
+                customized_pic: this.customizedData.img,
+                ord_sum: this.total,
+                promo_state: 0,  // 假設沒有使用優惠眷
+                ord_pay: 0,  // 實際付款方式
+                cus_order_state: 0,  // 根據需要設置實際訂單狀態
+                ord_note: this.memo,
+                receiver_name: this.isChecked ? this.name : '',
+                receiver_tel: this.isChecked ? this.phone : '',
+                receiver_address: `${this.selectedCity} ${this.selectedDistrict} ${this.addressDetail}`,
+                receiver_mail: this.isChecked ? this.email : '',
+                prefer_time: this.preferTime,
+                invoice_num: this.checkedCarrier ? this.loginStore.userData.mem_carrier : '',
+                uniform_num: this.checkedCompany ? this.loginStore.userData.mem_company : ''
+            };
+            console.log(orderData)
+
+            try {
+                let url = path + 'customized_order.php';
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(orderData)
+                });
+                const data = await response.json();
+                if (data.error) {
+                    console.error(data.msg);
+                } else {
+                    alert(data.msg);
+                    this.$router.push('/product');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
         }
+
     },
     
 };

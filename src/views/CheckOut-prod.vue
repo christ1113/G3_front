@@ -1,7 +1,7 @@
 <template>
     <div class="go-back">
         <router-link to="/cart">
-            <返回購物車 </router-link>
+            返回購物車 </router-link>
     </div>
     <div class="checkout-container">
         <div class="confirm-info">
