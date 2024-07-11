@@ -228,14 +228,18 @@
 import { useCartStore } from '../stores/cartStore.js'
 import CheckoutProd from '../components/layout/CheckoutProd.vue'
 import SuccessModal from '../components/layout/SuccessModal.vue';
+// 登入資料
+import { useLoginStore } from '@/stores/loginStore';
 export default {
     components: { CheckoutProd, SuccessModal },
     setup() {
         const cartStore = useCartStore();
+        const loginStore = useLoginStore();
 
         return {
             cartStore,
             selectedItems: cartStore.selectedItems, // 添加 selectedItems
+            loginStore,
             name: '',
         }
     },
@@ -294,6 +298,9 @@ export default {
         };
     },
     computed: {
+        loginStore() { 
+            return useLoginStore();
+        },
         uniqueCities() {
             const cityNames = this.cities.map(city => city.city_name);
             return [...new Set(cityNames)];
@@ -317,6 +324,10 @@ export default {
     },
     created() {
         this.fetchCities();
+        // 把會員資料帶到訂購人
+        this.orderInfo.name = this.loginStore.userData.mem_name;
+        this.orderInfo.phone = this.loginStore.userData.mem_tel;
+        this.orderInfo.email = this.loginStore.userData.mem_email;
     },
     methods: {
         async fetchCities() {
