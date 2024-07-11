@@ -26,11 +26,11 @@
                         <h5>信箱 ： {{this.loginStore.userData.mem_email}}</h5>
                         <h5>電話 ： <input type="text" v-model="this.loginStore.userData.mem_tel"></h5>
                         <h5>性別 ： 
-                            <input type="radio" id="gender-man" name="gender" value="M" checked />
+                            <input type="radio" id="gender-man" name="gender" value="M" :checked="this.loginStore.userData.mem_gender === 'M' " />
                             <label for="gender-man">男性</label>
-                            <input type="radio" id="gender-girl" name="gender" value="F" />
+                            <input type="radio" id="gender-girl" name="gender" value="F" :checked="this.loginStore.userData.mem_gender === 'F' "/>
                             <label for="gender-girl">女性</label>
-                            <input type="radio" id="gender-else" name="gender" value="O" />
+                            <input type="radio" id="gender-else" name="gender" value="O" :checked="this.loginStore.userData.mem_gender === 'O' " />
                             <label for="gender-else">其他</label>
                         </h5>
                         <h5>生日 ： 
@@ -64,6 +64,7 @@ export default{
         if (!this.loginStore.userData.mem_carrier) {
             this.loginStore.userData.mem_carrier = '/';
         }
+        
     },
     components:{
         MemberManageList
