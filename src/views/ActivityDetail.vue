@@ -232,7 +232,7 @@ export default {
     // 確保身體定義並包含正確的數據
   };
 
-  fetch(`http://localhost/G3_php/activity.php`, {
+  fetch(`/cid101/g3/api/activity.php`, {
     method: "POST",
     body: JSON.stringify(body)
   })
