@@ -95,7 +95,7 @@
 <script>
 import 'v-calendar/style.css';
 import Datepicker from 'vue3-datepicker';
-import {path} from '../../path.js'
+// import {path} from '../../path.js'
 
 export default {
   name: 'ActivityView',
@@ -132,7 +132,7 @@ export default {
       // 確保身體定義並包含正確的數據
     };
 
-    fetch(`http://localhost/G3_php/activity.php`, {
+    fetch(`/cid101/g3/api/activity.php`, {
       method: "POST",
       body: JSON.stringify(body)
     })
