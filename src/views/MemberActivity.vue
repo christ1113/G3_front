@@ -145,8 +145,14 @@ export default {
 
             .activityorder-card {
                 display: flex;
-                justify-content: flex-start;
+                justify-content: space-around;
                 margin-bottom: 40px;
+
+                @media screen and (max-width: $md) {
+                    flex-direction: column;
+                    align-items: center;
+                    gap: 20px;
+                }
 
                 .card-pic {
                     width: 30%;
@@ -154,6 +160,11 @@ export default {
                     border-radius: 10px;
                     overflow: hidden;
                     cursor: pointer;
+
+                    @media screen and (max-width: $md) {
+                        width: 70%;
+                }
+
 
                     img {
                         object-fit: cover;
@@ -166,6 +177,11 @@ export default {
                     display: flex;
                     flex-direction: column;
                     justify-content: space-between;
+
+                    @media screen and (max-width: $md) {
+                        gap:20px;
+                }
+                    
 
                 }
 

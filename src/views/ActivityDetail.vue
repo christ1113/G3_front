@@ -7,11 +7,11 @@
       el: '.swiper-pagination',
       clickable: true,
     }" :mousewheel="false" :keyboard="true" :loop="true" :modules="modules" class="mySwiper" v-if="selectedActivity">
-      <swiper-slide><img :src="parseImg(selectedActivity.pic)" alt="活動圖片"></swiper-slide>
-      <swiper-slide><img src="../assets/pic/activity/activity-8.jpg" alt=""></swiper-slide>
-      <swiper-slide><img src="../assets/pic/activity/activity-7.jpg" alt=""></swiper-slide>
-      <swiper-slide><img src="../assets/pic/activity/activity-9.jpg" alt=""></swiper-slide>
-      <swiper-slide><img src="../assets/pic/activity/activity-8.jpg" alt=""></swiper-slide>
+      <swiper-slide><img :src="parseImg(selectedActivity.act_img1)" alt="活動圖片"></swiper-slide>
+      <swiper-slide><img :src="parseImg(selectedActivity.act_img2)" alt=""></swiper-slide>
+      <swiper-slide><img :src="parseImg(selectedActivity.act_img3)" alt=""></swiper-slide>
+      <swiper-slide><img :src="parseImg(selectedActivity.act_img1)" alt=""></swiper-slide>
+      <swiper-slide><img :src="parseImg(selectedActivity.act_img2)" alt=""></swiper-slide>
       <button class="swiper-button-next"></button>
       <button class="swiper-button-prev"></button>
       <div class="swiper-pagination"></div>
@@ -19,7 +19,7 @@
   </section>
   <section class="section-activity-info" v-if="selectedActivity">
     <div class="activity-info">
-      <h4>{{ selectedActivity.loc }} | {{ selectedActivity.title }}</h4>
+      <h4>{{ selectedActivity.act_loc }} | {{ selectedActivity.act_name }}</h4>
       <h5>-活動介紹-</h5>
       <p>油紙傘彩繪課程是一個結合傳統工藝與現代藝術的手作體驗活動。參加者將學習如何製作和裝飾油紙傘，了解這項古老技藝的文化背景，並創作出獨一無二的藝術作品。本課程適合所有年齡層，無需任何手工或繪畫基礎。</p>
       <h5>-活動內容-</h5>
@@ -61,7 +61,7 @@
       </div>
       <div class="date">
         <h5>活動日期</h5>
-        <p>{{ selectedActivity.date }}</p>
+        <p>{{ selectedActivity.act_date }}</p>
       </div>
       <div class="session-time">
         <h5>場次時間</h5>
@@ -73,17 +73,17 @@
             {{ selectedActivity.time2 }}
           </button> -->
           <button @click="chooseTime('10:00~12:00')" :class="{ 'choose-time': currentTime === '10:00~12:00' }">
-            {{ selectedActivity.time1 }}
+            {{ getFirstSessionTime(selectedActivity.sess_time) }}
           </button>
           <button @click="chooseTime('13:00~15:00')" :class="{ 'choose-time': currentTime === '13:00~15:00' }">
-            {{ selectedActivity.time2 }}
+            {{ getSecondSessionTime(selectedActivity.sess_time) }}
           </button>
         </div>
       </div>
       <div class="num">
         <h5>選擇人數</h5>
         <div class="amount-button">
-          <p>{{ selectedActivity.price }}/人</p>
+          <p>NT${{ selectedActivity.act_price }}/人</p>
           <button @click="minus"><i class="fa-solid fa-minus"></i></button>
           <p>{{ count }}</p>
           <button @click="plus"><i class="fa-solid fa-plus"></i></button>
@@ -178,7 +178,7 @@ export default {
   },
   computed: {
     total() {
-      return this.count * this.price;
+      return this.count * this.selectedActivity.act_price;
     }
   },
   methods: {
@@ -191,8 +191,8 @@ export default {
           this.count,
           this.currentTime,
           this.total,
-          this.selectedActivity.loc,
-          this.parseImg(this.selectedActivity.pic));
+          this.selectedActivity.act_loc,
+          this.parseImg(this.selectedActivity.act_img1));
         this.router.push(`/checkout_act?id=${this.$route.params.id}&time=${this.currentTime}`);
       } else{
         alert('請先選擇場次時間');
@@ -202,17 +202,17 @@ export default {
       // 指到src || ..的意思是“回到上一層”
       return new URL(`../assets/pic/activity/${file}`, import.meta.url).href;
     },
-    async fetchActivities() {
-      try {
-        const response = await fetch(`${import.meta.env.BASE_URL}activities.json`);
-        this.activities = await response.json();
-        if (this.activities.length > 0) {
-          this.selectedActivity = this.activities[0]; // 預設選擇第一個活動
-        }
-      } catch (error) {
-        console.error('Error fetching activities:', error);
-      }
-    },
+    // async fetchActivities() {
+    //   try {
+    //     const response = await fetch(`${import.meta.env.BASE_URL}activities.json`);
+    //     this.activities = await response.json();
+    //     if (this.activities.length > 0) {
+    //       this.selectedActivity = this.activities[0]; // 預設選擇第一個活動
+    //     }
+    //   } catch (error) {
+    //     console.error('Error fetching activities:', error);
+    //   }
+    // },
     plus() {
       this.count += 1;
     },
@@ -220,9 +220,39 @@ export default {
       if (this.count == 1) return
       this.count -= 1;
     },
+    getFirstSessionTime(sess_time) {
+      return sess_time.split('、')[0].trim();
+    },
+    getSecondSessionTime(sess_time) {
+      return sess_time.split('、')[1].trim();
+    }
   },
   mounted() {
-    this.fetchActivities();
+    const body = {
+    // 確保身體定義並包含正確的數據
+  };
+
+  fetch(`/cid101/g3/api/activity.php`, {
+    method: "POST",
+    body: JSON.stringify(body)
+  })
+    .then(res => {
+      if (!res.ok) {
+        throw new Error('Network response was not ok ' + res.statusText);
+      }
+      return res.json();
+    })
+    .then(json => {
+      console.log(json);
+      this.activities = json["data"]["list"];
+      if (this.activities.length > 0) {
+        this.selectedActivity = this.activities[0]; // 預設選擇第一個活動
+      }
+    })
+    .catch(error => {
+      console.error('There has been a problem with your fetch operation:', error);
+    });
+
     const map = L.map(this.$refs.mapContainer, {
       center: [22.602995, 120.306013],
       zoom: 17,

@@ -44,7 +44,7 @@ export default {
     <div class="checkout-activity" v-if="item">
         <img :src="activitycheckout.image" :alt="item.name" class="activity-image">
         <div class="act-detail">
-            <div class="act-location">
+            <div class="act-info">
                 <h5>{{ item.title }}</h5>
                 <p>地點:{{  activitycheckout.location }}</p>
                 <p>活動時間: {{ item.date }} {{ activitycheckout.selectedTime }}</p>
@@ -82,6 +82,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+ @import "@/assets/sass/style";
+
 .card {
     display: flex;
     padding-left: 20px;
@@ -142,12 +144,19 @@ export default {
     padding-left: 20px;
     height: 30%;
 
+    @media screen and (max-width: $md){
+        flex-direction: column;
+    }
+
     .activity-image {
         height: auto;
         width: 23%;
         object-fit: cover;
         border-radius: 20px;
         margin: 20px 10px 20px 0;
+
+        @media screen and (max-width: $md){
+            width: 40%;    }
 
     }
 
@@ -156,7 +165,11 @@ export default {
         margin: auto 0;
         width: 80%;
 
-        .act-location {
+        @media screen and (max-width: $md){
+        flex-direction: column;
+    }
+
+        .act-info {
             h5 {
                 padding-bottom: 10px;
             }
@@ -172,12 +185,13 @@ export default {
 
         }
 
-        .act-people {
+        .act-people, .act-amount {
             margin: auto;
-        }
 
-        .act-amount {
-            margin: auto;
+            @media screen and (max-width: $md){
+                margin: 0;
+                padding-bottom: 10px;    
+            }
         }
 
     }

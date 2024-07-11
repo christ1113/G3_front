@@ -54,7 +54,8 @@
         <!-- <div v-if="menuOpen" class="mobile-menu"> -->
             <div :class="['mobile-menu', { open: menuOpen, close: !menuOpen }]" :data-initial-render="initialRender">
             <div class="overlay-background" @click="toggleMenu" v-show="menuOpen"></div>
-            <ul>
+            <div class="mobile-menu__menu-wrapper">
+                <ul>
                 <li v-for="(link, index) in links" :key="link.path">
                     <!-- 修改这里：移除 @click.prevent -->
                     <a href="#" @click.prevent="handleMainMenuClick(link, index)">
@@ -72,6 +73,7 @@
                 </li>
                 <li class="sign-out" @click="signOut">登出</li>
             </ul>
+            </div>
         </div>
     </header>
 </template>

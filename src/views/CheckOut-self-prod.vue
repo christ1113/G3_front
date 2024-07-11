@@ -117,13 +117,13 @@
             <form class="invoicing-form">
                 <div class="form-group">
                     <label for="invoicing">載具編號：</label>
-                    <input type="text" id="invoicing" maxlength="8">
-                    <input type="checkbox" class="invoicing-cb"><span>設定為常用載具</span>
+                    <input type="text" id="invoicing" maxlength="8" :value="checkedCarrier ? loginStore.userData.mem_carrier : ''" readonly>
+                    <input type="checkbox" class="invoicing-cb" v-model="checkedCarrier"><span>設定為常用載具</span>
                 </div>
                 <div class="form-group">
                     <label for="compilation-title">統一編號：</label>
-                    <input type="text" id="compilation" maxlength="8">
-                    <input type="checkbox" class="invoicing-cb"><span>設定為常用統編</span>
+                    <input type="text" id="compilation" maxlength="8" :value="checkedCompany ? loginStore.userData.mem_company : ''" readonly>
+                    <input type="checkbox" class="invoicing-cb" v-model="checkedCompany"><span>設定為常用統編</span>
                 </div>
             </form>
         </div>
@@ -201,6 +201,8 @@
     // 客製化資料暫存
     import { useCustomizedStore } from '@/stores/customized.js'
     import{mapState}from 'pinia'
+    // 登入資料
+    import { useLoginStore } from '@/stores/loginStore';
 
 export default {
     data() {
@@ -209,6 +211,9 @@ export default {
             phone: '',
             emali: '',
             isChecked: false,
+            checkedCarrier: false,
+            checkedCompany: false,
+            
 
             selectedCity: '',
             selectedDistrict: '',
@@ -224,6 +229,10 @@ export default {
         };
     },
     computed: {
+        // 會員資料
+        loginStore() { 
+            return useLoginStore();
+        },
         uniqueCities() {
             const cityNames = this.cities.map(city => city.city_name);
             return [...new Set(cityNames)];
@@ -236,6 +245,12 @@ export default {
         ...mapState(useCustomizedStore,['customizedData','total']),
     },
     created() {
+        
+        // 把會員資料帶到訂購人
+        this.name = this.loginStore.userData.mem_name;
+        this.phone = this.loginStore.userData.mem_tel;
+        this.email = this.loginStore.userData.mem_email;
+        
         this.fetchCities();
     },
     methods: {
