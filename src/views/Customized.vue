@@ -474,8 +474,8 @@
                 // 當所有設計元素都繪製完成後，進行最終的混合
                 Promise.all(drawPromises).then(() => {
                     Promise.all([
-                        loadImage('/src/assets/pic/customized/Preview.png'), // 替換為實際的背景圖路徑
-                        loadImage('/src/assets/pic/customized/Preview.png')  // 替換為實際的遮色片圖路徑
+                        loadImage(parseIcon('Preview.png')), // 替換為實際的背景圖路徑
+                        loadImage(parseIcon('Preview.png'))  // 替換為實際的遮色片圖路徑
                     ]).then(([backgroundImage, clipImage]) => {
                         // 在 finalCanvas 上繪製背景
                         finalCtx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
