@@ -43,11 +43,11 @@
                     <button @click="increaseQuantity"><i class="fa-solid fa-plus"></i></button>
                 </div>
                 <div class="product-fav">
-                    <button type="button">
+                    <!-- <button type="button">
                         <i class="fa-regular fa-heart"></i>
                         加入收藏
-
-                    </button>
+                    </button> -->
+                    <FavoriteButton :item="productInfo" />
                 </div>
                 <div class="product-cart">
                     <!-- <button type="button">
@@ -87,13 +87,15 @@
 </template>
 
 <script>
+import FavoriteButton from '@/components/layout/FavoriteButton.vue';
 import ProductCard from '@/components/layout/ProductCard.vue'
 // 引入ProductCard和Pinia的useCartStore
 import { useCartStore } from '../stores/cartStore.js';
 // import { path } from '../../path.js';
 export default {
     components: {
-        ProductCard
+        ProductCard,
+        FavoriteButton 
     },
     data() {
         return {

@@ -23,6 +23,7 @@ export const useFavStore = defineStore('fav', {
       }
     },
     toggleFavorite(item) {
+      console.log(item);
       if (this.isFavorite(item)) {
         this.removeFromFavorites(item)
       } else {
