@@ -34,7 +34,7 @@
                             :class="{ 'error-input': errors.orderInfoPhone }">
                     </div>
                     <div class="form-group">
-                        <label for="email">電子郵箱：</label>
+                        <label for="email">電子郵箱：<br>(選填)</label>
                         <input type="email" id="email" v-model="orderInfo.email" maxlength="255"
                             :class="{ 'error-input': errors.orderInfoEmail }">
                     </div>
@@ -93,7 +93,7 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="email">收件人電子郵箱：</label>
+                    <label for="email">收件人電子郵箱：<br>(選填)</label>
                     <input type="email" id="email" v-model="receiverInfo.email" maxlength="255"
                         :class="{ 'error-input': errors.receiverInfoEmail }">
                 </div>
@@ -106,14 +106,14 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="text">特殊需求備註：</label>
+                    <label for="text">特殊需求備註：<br>(選填)</label>
                     <textarea id="memo" v-model="memo" maxlength="500" class="large-textarea"></textarea>
                 </div>
 
             </form>
             <div class="disc-line-form"></div>
             <div class="invoicing-title">
-                <span>發票與統編</span>
+                <span>發票與統編(選填)</span>
             </div>
             <form class="invoicing-form">
                 <div class="form-group">
