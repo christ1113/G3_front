@@ -66,12 +66,7 @@
       <div class="session-time">
         <h5>場次時間</h5>
         <div class="time">
-          <!-- <button @click="chooseTime('10:00~12:00')" :class="{ 'choose-time': currentTime === '10:00~12:00' }">
-            {{ selectedActivity.time1 }}
-          </button>
-          <button @click="chooseTime('13:00~15:00')" :class="{ 'choose-time': currentTime === '13:00~15:00' }">
-            {{ selectedActivity.time2 }}
-          </button> -->
+
           <button @click="chooseTime('10:00~12:00')" :class="{ 'choose-time': currentTime === '10:00~12:00' }">
             {{ getFirstSessionTime(selectedActivity.sess_time) }}
           </button>

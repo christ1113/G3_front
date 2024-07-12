@@ -42,7 +42,7 @@ export default {
 <!-- CheckoutAct.vue -->
 <template>
     <div class="checkout-activity" v-if="item">
-        <img :src="activitycheckout.image" :alt="item.name" class="activity-image">
+        <img :src="activitycheckout.imageUrl" :alt="item.name" class="activity-image">
         <div class="act-detail">
             <div class="act-info">
                 <h5>{{ item.title }}</h5>
@@ -50,7 +50,7 @@ export default {
                 <p>活動時間: {{ item.date }} {{ activitycheckout.selectedTime }}</p>
             </div>
             <div class="act-people">
-                <p>人數：{{ activitycheckout.participantCount }}</p>
+                <p>人數：{{ activitycheckout.count }}</p>
             </div>
             <div class="act-amount">
                 <p>總計：NT${{ activitycheckout.totalAmount }}</p>

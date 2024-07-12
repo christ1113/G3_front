@@ -12,10 +12,10 @@
         <button @click="filterByStatus('全部')" :class="{ 'default-status': currentStatus === '全部' }">
           <p>全部</p>
         </button>
-        <button @click="filterByStatus(1)" :class="{ 'default-status': currentStatus === 1 }">
+        <button @click="filterByStatus('進行中')" :class="{ 'default-status': currentStatus === '進行中' }">
           <p>進行中</p>
         </button>
-        <button @click="filterByStatus(2)" :class="{ 'default-status': currentStatus === 2 }">
+        <button @click="filterByStatus('已結束')" :class="{ 'default-status': currentStatus === '已結束' }">
           <p>已結束</p>
         </button>
       </div>
@@ -143,11 +143,13 @@ export default {
         return res.json();
       })
       .then(json => {
-        // 確認有沒有response
-        console.log(json);
         this.responseData = json["data"]["list"];
-        this.activities = json["data"]["list"];
-        console.log(this.activities);
+        this.activities = this.responseData.map(activity => {
+          const currentDate = new Date();
+          const endDate = new Date(activity.end_date);
+          activity.act_status = currentDate <= endDate ? '進行中' : '已結束';
+          return activity;
+        });
       })
       .catch(error => {
         console.error('There has been a problem with your fetch operation:', error);
@@ -160,9 +162,9 @@ export default {
         // 對 activities 數據進行篩選
         return this.activities.filter(activity => {
           // 檢查活動的狀態是否匹配當前篩選條件
-          const matchesStatus = this.currentStatus === '全部' || activity.act_status === this.currentStatus;
+          const matchesStatus = this.currentStatus === '全部' || activity.act_status == this.currentStatus;
           // 檢查活動的類型是否匹配當前篩選條件
-          const matchesType = this.currentType === '全部' || activity.act_type === this.currentType;
+          const matchesType = this.currentType === '全部' || activity.act_type == this.currentType;
           // 檢查活動的地點是否匹配當前篩選條件
           const matchesLoc = this.currentLoc === '' || activity.act_loc === this.currentLoc;
           const matchesDate = !this.range.start || !this.range.end ||
@@ -194,9 +196,10 @@ export default {
       this.filterPending = true;
       this.currentStatus = status;
     },
-    filterByType(type) {
+    filterByType(act_type) {
+      console.log('Type filter clicked:', act_type);
       this.filterPending = true;
-      this.currentType = type;
+      this.currentType = act_type;
     },
     filterByLoc(loc) {
       this.filterPending = false;
