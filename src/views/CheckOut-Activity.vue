@@ -204,7 +204,7 @@ export default {
         },
         async fetchActivities() {
             try {
-                const response = await fetch('/activities.json');
+                const response = await fetch(`${import.meta.env.BASE_URL}activities.json`);
                 this.activities = await response.json();
 
                 // 假设从路由参数中获取 id
