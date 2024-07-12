@@ -352,9 +352,9 @@ export default {
             const selectOption = this.selectQuestionArray[this.currentQuestionIndex][answerKey];
 
             // 判斷答案是否一致
-            this.isCorrect = (selectOption === correctAnswer);
+            this.isCorrect = (selectOption == correctAnswer);
 
-            if (selectOption === correctAnswer) {
+            if (selectOption == correctAnswer) {
                 // 答對題數+1
                 this.correctAnswers++;
             }
@@ -413,12 +413,12 @@ export default {
             });
 
             // 如果答完五題
-            if (this.currentQuestionIndex === this.selectQuestionArray.length && this.correctAnswers >= 3) {
+            if (this.currentQuestionIndex == this.selectQuestionArray.length && this.correctAnswers >= 3) {
                 // 顯示優惠券
                 this.showDiscountFrame();
 
             }
-            else if (this.currentQuestionIndex === this.selectQuestionArray.length && this.correctAnswers < 3) {
+            else if (this.currentQuestionIndex == this.selectQuestionArray.length && this.correctAnswers < 3) {
                 // 顯示不及格跟再玩一次
                 this.showFailedFrame();
             }
