@@ -12,10 +12,10 @@
         <button @click="filterByStatus('全部')" :class="{ 'default-status': currentStatus === '全部' }">
           <p>全部</p>
         </button>
-        <button @click="filterByStatus(1)" :class="{ 'default-status': currentStatus === 1 }">
+        <button @click="filterByStatus('進行中')" :class="{ 'default-status': currentStatus === '進行中' }">
           <p>進行中</p>
         </button>
-        <button @click="filterByStatus(2)" :class="{ 'default-status': currentStatus === 2 }">
+        <button @click="filterByStatus('已結束')" :class="{ 'default-status': currentStatus === '已結束' }">
           <p>已結束</p>
         </button>
       </div>
@@ -143,11 +143,13 @@ export default {
         return res.json();
       })
       .then(json => {
-        // 確認有沒有response
-        console.log(json);
         this.responseData = json["data"]["list"];
-        this.activities = json["data"]["list"];
-        console.log(this.activities);
+        this.activities = this.responseData.map(activity => {
+          const currentDate = new Date();
+          const endDate = new Date(activity.end_date);
+          activity.act_status = currentDate <= endDate ? '進行中' : '已結束';
+          return activity;
+        });
       })
       .catch(error => {
         console.error('There has been a problem with your fetch operation:', error);
@@ -190,10 +192,9 @@ export default {
     goToActivityDetail(id) {
       this.$router.push({ name: 'activitydetail', params: { id } });
     },
-    filterByStatus(act_status) {
-      console.log('Type filter clicked:', act_status);
+    filterByStatus(status) {
       this.filterPending = true;
-      this.currentStatus = act_status;
+      this.currentStatus = status;
     },
     filterByType(act_type) {
       console.log('Type filter clicked:', act_type);
