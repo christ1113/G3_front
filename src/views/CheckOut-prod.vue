@@ -1,9 +1,12 @@
 <template>
     <div class="go-back">
         <router-link to="/cart">
-            <返回購物車 </router-link>
+            返回購物車 </router-link>
     </div>
     <div class="checkout-container">
+        <div v-if="formError" class="form-error">
+            {{ formError }}
+        </div>
         <div class="confirm-info">
             <div class="confirm-title">
                 <span>確認訂購人資料</span>
@@ -11,22 +14,29 @@
             <div class="disc-line"></div>
 
             <div class="ord-info">
-                <form>
-                    <div class="form-group">
+                <!-- <form> -->
+                <!-- <div class="form-group">
                         <label for="name">姓名:</label>
-                        <!-- <input type="text" id="name" v-model="orderInfo.name" maxlength="50"> -->
                         <input type="text" id="name" v-model="orderInfo.name" maxlength="50"
                             :class="{ 'error-input': errors.name }">
                         <div v-if="errors.name" class="error-message">{{ errors.name }}</div>
 
+                    </div> -->
+                <form @submit.prevent="validateForm">
+                    <div class="form-group">
+                        <label for="name">姓名:</label>
+                        <input type="text" id="name" v-model="orderInfo.name" maxlength="50"
+                            :class="{ 'error-input': errors.orderInfoName }">
                     </div>
                     <div class="form-group">
                         <label for="phone">聯繫電話：</label>
-                        <input type="text" id="phone" v-model="orderInfo.phone" maxlength="10">
+                        <input type="text" id="phone" v-model="orderInfo.phone" maxlength="10"
+                            :class="{ 'error-input': errors.orderInfoPhone }">
                     </div>
                     <div class="form-group">
-                        <label for="email">電子郵箱：</label>
-                        <input type="email" id="email" v-model="orderInfo.email" maxlength="255">
+                        <label for="email">電子郵箱：<br>(選填)</label>
+                        <input type="email" id="email" v-model="orderInfo.email" maxlength="255"
+                            :class="{ 'error-input': errors.orderInfoEmail }">
                     </div>
                 </form>
             </div>
@@ -43,61 +53,74 @@
             <div class="disc-line"></div>
             <div class="receiver-info">
                 <span class="receiver">收件人資料</span>
-                <input type="checkbox" v-model="sameAsOrderInfo" @change="updateReceiverInfo"><span>同訂購人資料</span>
+                <input type="checkbox" v-model="sameAsOrderInfo" @change="updateReceiverInfo">
+                <span>同訂購人資料</span>
             </div>
             <form>
                 <div class="form-group">
                     <label for="name">收件人姓名:</label>
-                    <input type="text" id="name" maxlength="50" v-model="receiverInfo.name">
+                    <!-- <input type="text" id="name" maxlength="50" v-model="receiverInfo.name"> -->
+                    <input type="text" id="receiverName" v-model="receiverInfo.name" maxlength="50"
+                        :class="{ 'error-input': errors.receiverInfoName }">
                 </div>
                 <div class="form-group">
                     <label for="phone">收件人聯絡電話：</label>
-                    <input type="text" id="phone" v-model="receiverInfo.phone" maxlength="10">
+                    <input type="text" id="receiverPhone" v-model="receiverInfo.phone" maxlength="10"
+                        :class="{ 'error-input': errors.receiverInfoPhone }">
                 </div>
                 <div class="form-group" id="address-form">
 
                     <label for="address">收件人地址：</label>
                     <div class="address-group">
-                        <select v-model="selectedCity" @change="onCityChange" class="select">
+                        <!-- <select v-model="selectedCity" @change="onCityChange" class="select"> -->
+                        <select v-model="selectedCity" @change="onCityChange" class="select"
+                            :class="{ 'error-input': errors.receiverInfoAddressCity }">
                             <option disabled value="">請選擇縣市</option>
                             <option v-for="city in uniqueCities" :key="city" :value="city">{{ city }}</option>
                         </select>
 
-                        <select v-model="selectedDistrict" class="select" :disabled="!selectedCity">
+                        <!-- <select v-model="selectedDistrict" class="select" :disabled="!selectedCity"> -->
+                        <select v-model="selectedDistrict" class="select" :disabled="!selectedCity"
+                            :class="{ 'error-input': errors.receiverInfoAddressDistrict }">
                             <option disabled value="">請選擇鄉鎮區</option>
                             <option v-for="district in filteredDistricts" :key="district.name" :value="district.name">{{
                                 district.name }}</option>
                         </select>
 
-                        <input type="text" v-model="addressDetail" placeholder="請填寫詳細地址">
+                        <!-- <input type="text" v-model="addressDetail" placeholder="請填寫詳細地址"> -->
+                        <input type="text" v-model="addressDetail" placeholder="請填寫詳細地址"
+                            :class="{ 'error-input': errors.receiverInfoAddressDetail }">
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="email">收件人電子郵箱：</label>
-                    <input type="email" id="email" v-model="receiverInfo.email" maxlength="255">
+                    <label for="email">收件人電子郵箱：<br>(選填)</label>
+                    <input type="email" id="email" v-model="receiverInfo.email" maxlength="255"
+                        :class="{ 'error-input': errors.receiverInfoEmail }">
                 </div>
                 <div class="form-group">
                     <label for="prefer-time">偏好收貨時間：</label>
-                    <select v-model="preferTime" @change="onTimeChange" class="select">
+                    <select v-model="preferTime" @change="onTimeChange" class="select"
+                        :class="{ 'error-input': errors.preferTime }">
                         <option disabled value="">請選擇時間段</option>
                         <option v-for="time in times" :key="time.name" value="time.name">{{ time.name }}</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="text">特殊需求備註：</label>
+                    <label for="text">特殊需求備註：<br>(選填)</label>
                     <textarea id="memo" v-model="memo" maxlength="500" class="large-textarea"></textarea>
                 </div>
 
             </form>
             <div class="disc-line-form"></div>
             <div class="invoicing-title">
-                <span>發票與統編</span>
+                <span>發票與統編(選填)</span>
             </div>
             <form class="invoicing-form">
                 <div class="form-group">
                     <label for="invoicing">載具編號：</label>
                     <div class="invoicing-use">
-                        <input type="text" id="invoicing" maxlength="8">
+                        <input type="text" id="invoicing" v-model="invoicingNumber" maxlength="8"
+                            :class="{ 'error-input': errors.invoicingNumber }">
                         <div class="invoicing-often">
                             <input type="checkbox" class="invoicing-cb">
                             <span>設定為常用載具</span>
@@ -107,7 +130,8 @@
                 <div class="form-group">
                     <label for="compilation-title">統一編號：</label>
                     <div class="invoicing-use">
-                        <input type="text" id="compilation" maxlength="8">
+                        <input type="text" id="compilation" v-model="compilationNumber" maxlength="8"
+                            :class="{ 'error-input': errors.compilationNumber }">
                         <div class="invoicing-often">
                             <input type="checkbox" class="invoicing-cb">
                             <span>設定為常用統編</span>
@@ -131,24 +155,29 @@
                     <div class="form-group">
                         <label for="card-number">信用卡號碼：</label>
                         <input type="text" id="card-number-1" ref="cardNumber1" class="card-input" maxlength="4"
+                            :class="{ 'error-input': errors.creditCardNumber }"
                             @input="moveToNext($event, 'cardNumber2')">
                         <span>-</span>
                         <input type="text" id="card-number-2" ref="cardNumber2" class="card-input" maxlength="4"
+                            :class="{ 'error-input': errors.creditCardNumber }"
                             @input="moveToNext($event, 'cardNumber3')">
                         <span>-</span>
                         <input type="text" id="card-number-3" ref="cardNumber3" class="card-input" maxlength="4"
+                            :class="{ 'error-input': errors.creditCardNumber }"
                             @input="moveToNext($event, 'cardNumber4')">
                         <span>-</span>
-                        <input type="text" id="card-number-4" ref="cardNumber4" class="card-input" maxlength="4">
+                        <input type="text" id="card-number-4" ref="cardNumber4" class="card-input" maxlength="4"
+                            :class="{ 'error-input': errors.creditCardNumber }">
                     </div>
                     <div class="form-group">
                         <label for="expiry-date">有效日期：</label>
                         <input type="text" id="expiry-date-mm" ref="expiryDate1" placeholder="MM" maxlength="2"
-                            @input="moveToNext($event, 'expiryDate2')">
+                            :class="{ 'error-input': errors.expiryDate }" @input="moveToNext($event, 'expiryDate2')">
                         <span>/</span>
                         <input type="text" id="expiry-date-yy" ref="expiryDate2" placeholder="YY" maxlength="2"
-                            @input="moveToNext($event, 'cvc')">
-                        <input type="text" id="cvc" ref="cvc" placeholder="信用卡背面的三碼" maxlength="3">
+                            :class="{ 'error-input': errors.expiryDate }" @input="moveToNext($event, 'cvc')">
+                        <input type="text" id="cvc" ref="cvc" placeholder="信用卡背面的三碼" maxlength="3"
+                            :class="{ 'error-input': errors.cvc }">
                     </div>
 
                     <div class="form-group">
@@ -190,7 +219,7 @@
             </div>
         </div>
         <div class="confirm-checkout">
-            <button @click="submitOrder">確認結帳</button>
+            <button @click="validateForm">確認結帳</button>
         </div>
         <SuccessModal :visible="showSuccessModal" message="結帳成功！" @close="closeModal" />
     </div>
@@ -199,15 +228,18 @@
 import { useCartStore } from '../stores/cartStore.js'
 import CheckoutProd from '../components/layout/CheckoutProd.vue'
 import SuccessModal from '../components/layout/SuccessModal.vue';
-import Swal from 'sweetalert2';
+// 登入資料
+import { useLoginStore } from '@/stores/loginStore';
 export default {
     components: { CheckoutProd, SuccessModal },
     setup() {
         const cartStore = useCartStore();
+        const loginStore = useLoginStore();
 
         return {
             cartStore,
             selectedItems: cartStore.selectedItems, // 添加 selectedItems
+            loginStore,
             name: '',
         }
     },
@@ -245,6 +277,9 @@ export default {
                 expiryYear: '',
                 cvc: ''
             },
+            invoicingNumber: '',
+            compilationNumber: '',
+            memo: '',
             errors: {},
             sameAsOrderInfo: false,
             originalReceiverInfo: {
@@ -258,10 +293,14 @@ export default {
                 { name: '下午(13:00~18:00)' }
             ],
             cities: [],
-            districts: []
+            districts: [],
+            formError: '',
         };
     },
     computed: {
+        loginStore() { 
+            return useLoginStore();
+        },
         uniqueCities() {
             const cityNames = this.cities.map(city => city.city_name);
             return [...new Set(cityNames)];
@@ -285,6 +324,10 @@ export default {
     },
     created() {
         this.fetchCities();
+        // 把會員資料帶到訂購人
+        this.orderInfo.name = this.loginStore.userData.mem_name;
+        this.orderInfo.phone = this.loginStore.userData.mem_tel;
+        this.orderInfo.email = this.loginStore.userData.mem_email;
     },
     methods: {
         async fetchCities() {
@@ -305,13 +348,102 @@ export default {
         onTimeChange() {
             console.Consolelog('Selected time:', this.preferTime);
         },
-        // submitOrder() {
-        //     // 顯示成功彈窗
-        //     this.showSuccessModal = true;
+        validateForm() {
+            this.errors = {};
 
-        //     // 清空購物車
-        //     this.cartStore.cleanCart();
-        // },
+            // 訂購人信息驗證
+            if (!this.orderInfo.name) {
+                this.errors.orderInfoName = true;
+            }
+            if (!this.orderInfo.phone) {
+                this.errors.orderInfoPhone = true;
+            } else if (!/^09\d{8}$/.test(this.orderInfo.phone)) {
+                this.errors.orderInfoPhone = true;
+            }
+            if (this.orderInfo.email && !/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(this.orderInfo.email)) {
+                this.errors.orderInfoEmail = true;
+            }
+
+            // 收件人信息驗證
+            if (!this.receiverInfo.name) {
+                this.errors.receiverInfoName = true;
+            }
+            if (!this.receiverInfo.phone) {
+                this.errors.receiverInfoPhone = true;
+            } else if (!/^09\d{8}$/.test(this.receiverInfo.phone)) {
+                this.errors.receiverInfoPhone = true;
+            }
+            if (this.receiverInfo.email && !/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(this.receiverInfo.email)) {
+                this.errors.receiverInfoEmail = true;
+            }
+            if (!this.selectedCity) {
+                this.errors.receiverInfoAddressCity = true;
+            }
+            if (!this.selectedDistrict) {
+                this.errors.receiverInfoAddressDistrict = true;
+            }
+            if (!this.addressDetail) {
+                this.errors.receiverInfoAddressDetail = true;
+            }
+            if (!this.preferTime) {
+                this.errors.preferTime = true;
+            }
+
+            // 載具和統一編號驗證
+            if (this.invoicingNumber && !/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8}$/.test(this.invoicingNumber)) {
+                this.errors.invoicingNumber = true;
+            }
+
+            // 統一編號驗證
+            if (this.compilationNumber && !/^\d{8}$/.test(this.compilationNumber)) {
+                this.errors.compilationNumber = true;
+            }
+
+            // 信用卡信息驗證
+            const creditCardNumber = `${this.$refs.cardNumber1.value}${this.$refs.cardNumber2.value}${this.$refs.cardNumber3.value}${this.$refs.cardNumber4.value}`;
+        if (!creditCardNumber || !/^\d{16}$/.test(creditCardNumber)) {
+            this.errors.creditCardNumber = true;
+        }
+        const expiryMonth = this.$refs.expiryDate1.value;
+        const expiryYear = this.$refs.expiryDate2.value;
+        const expiryDate = `${expiryMonth}/${expiryYear}`;
+        if (!expiryDate || !/^\d{2}\/\d{2}$/.test(expiryDate)) {
+            this.errors.expiryDate = true;
+        } else {
+            const [month, year] = expiryDate.split('/');
+            const monthNum = parseInt(month, 10);
+            if (monthNum < 1 || monthNum > 12) {
+                this.errors.expiryDate = true;
+            } else {
+                const currentDate = new Date();
+                const expiryDateObj = new Date(`20${year}`, month - 1);
+                if (expiryDateObj < currentDate) {
+                    this.errors.expiryDate = true;
+                }
+            }
+        }
+        if (!this.$refs.cvc.value || !/^\d{3}$/.test(this.$refs.cvc.value)) {
+            this.errors.cvc = true;
+        }
+            // 如果沒有錯誤，提交訂單
+            // 如果有錯誤，顯示錯誤信息
+            if (Object.keys(this.errors).length > 0) {
+                console.log('表單驗證錯誤:', this.errors);
+                this.formError = '請填寫所有必填字段並確保信息正確';
+                window.scrollTo(0, 0);
+                return false;  // 阻止表單提交
+            }
+
+            // 如果沒有錯誤，提交訂單
+            this.submitOrder();
+        },
+        submitOrder() {
+            // 顯示成功彈窗
+            this.showSuccessModal = true;
+
+            // 清空購物車
+            this.cartStore.cleanCart();
+        },
         closeModal() {
             this.showSuccessModal = false;
             // 重定向到首頁
@@ -339,40 +471,7 @@ export default {
                 };
             }
         },
-        validateForm() {
-            this.errors = {};
-            if (!this.orderInfo.name) errors.push("請填寫訂購人姓名");
-            if (!this.orderInfo.phone) errors.push("請填寫訂購人正確格式聯繫電話(台灣電話10碼)");
-            if (!this.receiverInfo.name) errors.push("請填寫收件人姓名");
-            if (!this.receiverInfo.phone) errors.push("請填寫正確格式收件人聯絡電話(台灣電話10碼)");
-            if (!this.selectedCity || !this.selectedDistrict || !this.addressDetail) {
-                errors.push("請填寫完整的收件人地址");
-            }
-            if (!this.preferTime) errors.push("請選擇偏好收貨時間");
-            // 驗證信用卡資訊
-            const { number1, number2, number3, number4, expiryMonth, expiryYear, cvc } = this.creditCard;
-            if (!number1 || !number2 || !number3 || !number4) errors.push("請填寫完整的信用卡號碼");
-            if (!expiryMonth || !expiryYear) errors.push("請填寫信用卡有效日期");
-            if (!cvc) errors.push("請填寫信用卡背面的三碼");
-            return Object.keys(this.errors).length === 0;
-        },
-        async submitOrder() {
-            const errors = this.validateForm();
-            if (errors.length > 0) {
-                // 使用 SweetAlert2 顯示錯誤信息
-                await Swal.fire({
-                    icon: 'error',
-                    title: '表單驗證失敗',
-                    html: Object.values(this.errors).join('<br>')
-                });
-                return;
-            }
-            // 顯示成功彈窗
-            this.showSuccessModal = true;
 
-            // 清空購物車
-            this.cartStore.cleanCart();
-        }
     },
     watch: {
         orderInfo: {
@@ -402,9 +501,14 @@ export default {
     border-color: red;
 }
 
-.error-message {
+
+.form-error {
     color: red;
-    font-size: 12px;
+    background-color: #ffeeee;
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid red;
+    border-radius: 4px;
 }
 
 .checkout-container {
@@ -854,34 +958,36 @@ export default {
     .checkout-container {
         width: 80%;
         margin: 50px auto;
-        .confirm-info{
-        .ord-info {
-            font-size: 14px;
 
-            form {
-                display: flex;
-                flex-direction: column;
-                gap: 25px;
-                width: 100%;
+        .confirm-info {
+            .ord-info {
+                font-size: 14px;
 
-                .form-group {
+                form {
                     display: flex;
-                    align-items: flex-start;
-                    margin: auto 0;
+                    flex-direction: column;
+                    gap: 25px;
+                    width: 100%;
 
-                    label {
-                        flex-basis: 25%;
+                    .form-group {
+                        display: flex;
+                        align-items: flex-start;
                         margin: auto 0;
-                    }
 
-                    input {
-                        height: 20px;
-                        flex-basis: 25%;
+                        label {
+                            flex-basis: 25%;
+                            margin: auto 0;
+                        }
+
+                        input {
+                            height: 20px;
+                            flex-basis: 25%;
+                        }
                     }
                 }
             }
         }
-}
+
         .confirm-ord {
 
             .confirm-ord-title {
@@ -1479,27 +1585,31 @@ export default {
                     display: flex;
                     align-items: flex-start;
                     margin: auto 0;
-                   
+
                     label {
                         flex-basis: 40%;
                         margin: auto 0;
                         font-size: 14px;
 
                     }
+
                     .invoicing-use {
                         display: flex;
                         align-items: center;
                         flex-wrap: wrap;
                         margin-top: 10px;
+
                         input {
-                        height: 20px;
-                        flex-basis: 20%;
-                    }
+                            height: 20px;
+                            flex-basis: 20%;
+                        }
+
                         .invoicing-often {
                             width: auto;
-                            .invoicing-cb{
+
+                            .invoicing-cb {
                                 margin: 0 10px 0 20px;
-                            } 
+                            }
 
                             span {
                                 display: inline-block;

@@ -1,21 +1,22 @@
 // stores/activity.js
 import { defineStore } from 'pinia';
 
-export const useActivityStore = defineStore('activitycheckout', {
+export const useActivityStore = defineStore({
+  id: 'activitycheckout',
   state: () => ({
-    participantCount: 0,
+    count: 0,
     selectedTime: '',
     totalAmount: 0,
     location: '',
-    image: '',
+    imageUrl: '',
   }),
   actions: {
-    setActivityDetails(count, time, total, location, image) {
-      this.participantCount = count;
-      this.selectedTime = time;
-      this.totalAmount = total;
+    setActivityDetails(count, selectedTime, totalAmount, location, imageUrl) {
+      this.count = count;
+      this.selectedTime = selectedTime;
+      this.totalAmount = totalAmount;
       this.location = location;
-      this.image = image;
+      this.imageUrl = imageUrl;
     },
     setSelectedTime(time) {
       this.selectedTime = time;

@@ -160,9 +160,9 @@ export default {
         // 對 activities 數據進行篩選
         return this.activities.filter(activity => {
           // 檢查活動的狀態是否匹配當前篩選條件
-          const matchesStatus = this.currentStatus === '全部' || activity.act_status === this.currentStatus;
+          const matchesStatus = this.currentStatus === '全部' || activity.act_status == this.currentStatus;
           // 檢查活動的類型是否匹配當前篩選條件
-          const matchesType = this.currentType === '全部' || activity.act_type === this.currentType;
+          const matchesType = this.currentType === '全部' || activity.act_type == this.currentType;
           // 檢查活動的地點是否匹配當前篩選條件
           const matchesLoc = this.currentLoc === '' || activity.act_loc === this.currentLoc;
           const matchesDate = !this.range.start || !this.range.end ||
@@ -190,13 +190,15 @@ export default {
     goToActivityDetail(id) {
       this.$router.push({ name: 'activitydetail', params: { id } });
     },
-    filterByStatus(status) {
+    filterByStatus(act_status) {
+      console.log('Type filter clicked:', act_status);
       this.filterPending = true;
-      this.currentStatus = status;
+      this.currentStatus = act_status;
     },
-    filterByType(type) {
+    filterByType(act_type) {
+      console.log('Type filter clicked:', act_type);
       this.filterPending = true;
-      this.currentType = type;
+      this.currentType = act_type;
     },
     filterByLoc(loc) {
       this.filterPending = false;
