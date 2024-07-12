@@ -19,7 +19,7 @@
                             </li>
                         </ul>
                     </li>
-                    
+
                 </ul>
             </nav>
             <div class="icons">
@@ -39,7 +39,7 @@
                         <img class="mobile-user" src="../../assets/pic/mobile-user.svg" alt="會員登入/註冊">
                     </a>
                 </button>
-                <button class="member">{{this.loginStore.userData.mem_name}}
+                <button class="member">{{ this.loginStore.userData.mem_name }}
                     <ul>
                         <router-link class="mem-info" to="/memberinfo">會員資訊</router-link>
                         <li class="sign-out" @click="signOut">登出</li>
@@ -52,27 +52,28 @@
             </div>
         </div>
         <!-- <div v-if="menuOpen" class="mobile-menu"> -->
-            <div :class="['mobile-menu', { open: menuOpen, close: !menuOpen }]" :data-initial-render="initialRender">
+        <div :class="['mobile-menu', { open: menuOpen, close: !menuOpen }]" :data-initial-render="initialRender">
             <div class="overlay-background" @click="toggleMenu" v-show="menuOpen"></div>
             <div class="mobile-menu__menu-wrapper">
                 <ul>
-                <li v-for="(link, index) in links" :key="link.path">
-                    <!-- 修改这里：移除 @click.prevent -->
-                    <a href="#" @click.prevent="handleMainMenuClick(link, index)">
-                        {{ link.name }}
-                        <i v-if="link.submenu"
-                            :class="{ 'fa-solid fa-chevron-down': !link.showSubMenu, 'fa-solid fa-chevron-up': link.showSubMenu }"></i>
-                    </a>
-                    <transition name="slide-fade">
-                    <ul style="position: static; height: auto;" v-if="link.submenu && link.showSubMenu" class="submenu">
-                        <li v-for="sublink in link.submenu" :key="sublink.path">
-                            <RouterLink :to="sublink.path" @click="closeMenu">{{ sublink.name }}</RouterLink>
-                        </li>
-                    </ul>
-                </transition>
-                </li>
-                <li class="sign-out" @click="signOut">登出</li>
-            </ul>
+                    <li v-for="(link, index) in links" :key="link.path">
+                        <!-- 修改这里：移除 @click.prevent -->
+                        <a href="#" @click.prevent="handleMainMenuClick(link, index)">
+                            {{ link.name }}
+                            <i v-if="link.submenu"
+                                :class="{ 'fa-solid fa-chevron-down': !link.showSubMenu, 'fa-solid fa-chevron-up': link.showSubMenu }"></i>
+                        </a>
+                        <transition name="slide-fade">
+                            <ul style="position: static; height: auto;" v-if="link.submenu && link.showSubMenu"
+                                class="submenu">
+                                <li v-for="sublink in link.submenu" :key="sublink.path">
+                                    <RouterLink :to="sublink.path" @click="closeMenu">{{ sublink.name }}</RouterLink>
+                                </li>
+                            </ul>
+                        </transition>
+                    </li>
+                    <li class="sign-out" @click="signOut">登出</li>
+                </ul>
             </div>
         </div>
     </header>
@@ -160,34 +161,34 @@ export default {
         //     }, 2000)
         // },
         toggleSubMenu(index) {
-    // console.log('Before toggle:', this.links[index]);
+            // console.log('Before toggle:', this.links[index]);
 
-    if (this.activeSubMenu === index) {
-        this.activeSubMenu = null;
-    } else {
-        this.activeSubMenu = index;
-    }
-
-    this.links[index].showSubMenu = !this.links[index].showSubMenu;
-    console.log('After toggle:', this.links[index].showSubMenu);
-
-    this.$nextTick(() => {
-        const submenu = this.$el.querySelector(`.mobile-menu ul li:nth-child(${index + 1}) .submenu`);
-        if (submenu) {
-            if (this.links[index].showSubMenu) {
-                submenu.style.maxHeight = submenu.scrollHeight + "px";
-                // console.log('Submenu opened, maxHeight:', submenu.style.maxHeight);
+            if (this.activeSubMenu === index) {
+                this.activeSubMenu = null;
             } else {
-                submenu.style.maxHeight = "0px";
-                // console.log('Submenu closed, maxHeight:', submenu.style.maxHeight);
+                this.activeSubMenu = index;
             }
-        }
-    });
 
-    setTimeout(() => {
-        console.log('After 2 seconds:', this.links[index].showSubMenu);
-    }, 2000);
-},
+            this.links[index].showSubMenu = !this.links[index].showSubMenu;
+            console.log('After toggle:', this.links[index].showSubMenu);
+
+            this.$nextTick(() => {
+                const submenu = this.$el.querySelector(`.mobile-menu ul li:nth-child(${index + 1}) .submenu`);
+                if (submenu) {
+                    if (this.links[index].showSubMenu) {
+                        submenu.style.maxHeight = submenu.scrollHeight + "px";
+                        // console.log('Submenu opened, maxHeight:', submenu.style.maxHeight);
+                    } else {
+                        submenu.style.maxHeight = "0px";
+                        // console.log('Submenu closed, maxHeight:', submenu.style.maxHeight);
+                    }
+                }
+            });
+
+            setTimeout(() => {
+                console.log('After 2 seconds:', this.links[index].showSubMenu);
+            }, 2000);
+        },
         handleMainMenuClick(link, index) {
             console.log(link.submenu)
             console.log(link)
@@ -218,9 +219,9 @@ export default {
 
         // 更新路由監聽器
         this.$router.afterEach(() => {
-        this.closeMenu(); // 使用新的 closeMenu 方法
-    });
-    setTimeout(() => {
+            this.closeMenu(); // 使用新的 closeMenu 方法
+        });
+        setTimeout(() => {
             this.initialRender = false;
         }, 0);
     },
