@@ -309,7 +309,7 @@ export default {
             console.log(orderData)
 
             try {
-                let url = path + 'customized_order.php';
+                let url = path + 'customized_add_order.php';
                 const response = await fetch(url, {
                     method: 'POST',
                     headers: {
