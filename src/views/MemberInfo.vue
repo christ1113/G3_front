@@ -53,10 +53,20 @@
 import { useLoginStore } from '@/stores/loginStore';
 import MemberManageList from '../components/layout/MemberManageList.vue'
 
+import {path} from "../../path.js"; //路徑
+
 export default{
     data() {
         return {
-
+            editedData: {
+                mem_name: '',
+                mem_tel: '',
+                mem_gender: '',
+                mem_birth: '',
+                mem_addr: '',
+                mem_carrier: '',
+                mem_company: ''
+            }
         }
     },
     created() {
@@ -74,6 +84,48 @@ export default{
             return useLoginStore();
         }
     },
+    methods: {
+        saveMemberInfo() {
+        const url = path + 'member_updata.php';
+
+        // 取得更新後的會員資料
+        const updatedData = {
+            mem_name: this.editedData.mem_name,
+            mem_tel: this.editedData.mem_tel,
+            mem_gender: this.editedData.mem_gender,
+            mem_birth: this.editedData.mem_birth,
+            mem_addr: this.editedData.mem_addr,
+            mem_carrier: this.editedData.mem_carrier,
+            mem_company: this.editedData.mem_company
+        };
+
+        // 使用 fetch 發送 POST 請求到後端
+        fetch(url, {
+            method: 'POST',
+            headers: {
+            'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(updatedData)
+        })
+        .then(response => {
+            if (!response.ok) {
+            throw new Error('Network response was not ok ' + response.statusText);
+            }
+            return response.json();
+        })
+        .then(json => {
+            console.log('更新成功:', json);
+            // 可以在更新成功後做一些處理，例如提示使用者更新成功
+            // 更新用戶資料，例如使用 Vuex 的 commit 方法
+            this.$store.commit('updateUserData', updatedData);
+        })
+        .catch(error => {
+            console.error('There has been a problem with your fetch operation:', error);
+            // 可以在更新失敗後做一些處理，例如提示使用者更新失敗
+        });
+        }
+    }
+
 }
 
 

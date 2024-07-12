@@ -234,32 +234,43 @@ export default {
         async register() {
             try {
                 let url = path + 'member_add.php';
+                // let data = JSON.stringify({
+                //         email: this.newEmail,
+                //         password: this.newPassword,
+                //         gender: this.gender,
+                //         birth: this.birthDate
+                //     });
+                // console.log("----", data);
                 const response = await fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: new URLSearchParams({
-                    email: this.newEmail,
-                    password: this.newPassword,
-                    gender: this.gender,
-                    birth: this.birthDate
-                })
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: this.newEmail,
+                        password: this.newPassword,
+                        gender: this.gender,
+                        birth: this.birthDate
+                    })
                 });
 
                 if (!response.ok) {
-                throw new Error('Network response was not ok');
+                    const errorText = await response.text();
+                    console.error('Server response:', errorText);
+                    throw new Error(`HTTP error! status: ${response.status}, body: ${errorText}`);
                 }
 
-                const result = await response.json();
-                console.log(result)
-                if (result.code === 200) {
-                alert(result.msg);
+                const data = await response.json();
+                console.log(data);
+                if (data.code === 200) {
+                    alert(data.msg);
                 } else {
-                alert(result.msg);
+                    alert(data.msg);
                 }
+            
             } catch (error) {
                 console.error('Error:', error);
+                alert('註冊籌公');
             }
         },
 
