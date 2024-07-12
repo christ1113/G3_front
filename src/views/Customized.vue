@@ -235,6 +235,8 @@
     import { useCustomizedStore } from '@/stores/customized.js'
     import{mapState,mapActions}from 'pinia'
 
+    import {path} from "../../path.js"; //路徑
+
     export default{
         data() {
             return {
@@ -614,7 +616,8 @@
         mounted() {
             
             const body = {}; // 如果沒有特定的數據需要在請求正文中發送，可以保持空對象
-            fetch(`http://localhost/g3_php/customized.php`, {
+            let url = path + 'customized.php';
+            fetch(url, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"

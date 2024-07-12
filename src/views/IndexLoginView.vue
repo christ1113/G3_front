@@ -48,15 +48,15 @@
                     <div class="input-field" v-if="content === 'register'">
                         <div class="content-container">
                             <div class="register-input">
-                                <input class="email" name="memclass" type="email" placeholder="請輸入電子郵件" v-model="emailData">
+                                <input class="email" name="memclass" type="email" placeholder="請輸入電子郵件" v-model="newEmail">
                                 <div class="input-icon">
-                                    <input class="password" name="memPsw" type="password" placeholder="請輸入密碼" maxlength="12" minlength="6" v-model="password">
+                                    <input class="password" name="memPsw" type="password" placeholder="請輸入密碼" maxlength="12" minlength="6" v-model="newPassword">
                                     <picture @click="togglePasswordVisibility($event, 'password')" class="eyes">
                                         <img id="eye" src="/src/assets/pic/login/eye-close.svg" alt="" title="close">
                                     </picture>
                                 </div>
                                 <div class="input-icon">
-                                    <input class="password" name="memPsw" type="password" placeholder="確認密碼" maxlength="12" minlength="6" v-model="confirmPassword">
+                                    <input class="password" name="memPsw" type="password" placeholder="確認密碼" maxlength="12" minlength="6" v-model="checkPassword">
                                     <picture @click="togglePasswordVisibility($event, 'confirmPassword')" class="eyes">
                                         <img id="eye" src="/src/assets/pic/login/eye-close.svg" alt="" title="close">
                                     </picture>
@@ -68,19 +68,19 @@
                                 </div>
                                 <div class="gender">
                                     <h5>性別 ：</h5>
-                                    <input type="radio" id="gender-man" name="gender" value="man" checked />
+                                    <input type="radio" id="gender-man" name="gender" value="M" v-model="gender" checked />
                                     <label for="gender-man">男性</label>
-                                    <input type="radio" id="gender-girl" name="gender" value="girl" />
+                                    <input type="radio" id="gender-girl" name="gender" value="F" v-model="gender"/>
                                     <label for="gender-girl">女性</label>
-                                    <input type="radio" id="gender-else" name="gender" value="else" />
+                                    <input type="radio" id="gender-else" name="gender" value="O" v-model="gender"/>
                                     <label for="gender-else">其他</label>
                                 </div>
                                 <div class="date">
                                     <h5>生日 ：</h5>
-                                    <input type="date" value="2000-06-19" min="1960-01-01" max="2006-12-31" />
+                                    <input type="date"  value="2000-06-19" min="1960-01-01" max="2006-12-31" v-model="birthDate" />
                                 </div>
                             </div>
-                            <button class="register-btn">註冊</button>
+                            <button class="register-btn" @click="register()">註冊</button>
                         </div>
                     </div>
                     <span class="x" @click="closeLoginBox">
@@ -106,7 +106,13 @@ export default {
             emailData: '',
             password: '',
             confirmPassword: '',
-            loginConsider: true
+            loginConsider: true,
+
+            newEmail:'',
+            newPassword:'',
+            checkPassword:'',
+            gender:'M',
+            birthDate:'',
         };
     },
     setup() {
@@ -218,6 +224,39 @@ export default {
                     alert(data.msg);
                     this.loginStore.emailData = ''
                     this.loginStore.pswData = ''
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        },
+
+        // 註冊
+        async register() {
+            try {
+                let url = path + 'member_add.php';
+                const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: new URLSearchParams({
+                    email: this.newEmail,
+                    password: this.newPassword,
+                    gender: this.gender,
+                    birth: this.birthDate
+                })
+                });
+
+                if (!response.ok) {
+                throw new Error('Network response was not ok');
+                }
+
+                const result = await response.json();
+                console.log(result)
+                if (result.code === 200) {
+                alert(result.msg);
+                } else {
+                alert(result.msg);
                 }
             } catch (error) {
                 console.error('Error:', error);
