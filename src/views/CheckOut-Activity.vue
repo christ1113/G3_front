@@ -4,26 +4,39 @@
             <返回活動詳情頁 </router-link>
     </div>
     <div class="checkout-container">
+        <div v-if="formError" class="form-error">
+            {{ formError }}
+        </div>
         <div class="confirm-info">
             <div class="confirm-title">
                 <span>確認訂購人資料</span>
-                <!-- <button><i class="fa-solid fa-chevron-down"></i></button> -->
             </div>
             <div class="disc-line"></div>
 
             <div class="ord-info">
-                <form>
+                <!-- <form> -->
+                <!-- <div class="form-group">
+                        <label for="name">姓名:</label>
+                        <input type="text" id="name" v-model="orderInfo.name" maxlength="50"
+                            :class="{ 'error-input': errors.name }">
+                        <div v-if="errors.name" class="error-message">{{ errors.name }}</div>
+
+                    </div> -->
+                <form @submit.prevent="validateForm">
                     <div class="form-group">
                         <label for="name">姓名:</label>
-                        <input type="text" id="name">
+                        <input type="text" id="name" v-model="orderInfo.name" maxlength="50"
+                            :class="{ 'error-input': errors.orderInfoName }">
                     </div>
                     <div class="form-group">
                         <label for="phone">聯繫電話：</label>
-                        <input type="text" id="phone">
+                        <input type="text" id="phone" v-model="orderInfo.phone" maxlength="10"
+                            :class="{ 'error-input': errors.orderInfoPhone }">
                     </div>
                     <div class="form-group">
                         <label for="email">電子郵箱：</label>
-                        <input type="email" id="email">
+                        <input type="email" id="email" v-model="orderInfo.email" maxlength="255"
+                            :class="{ 'error-input': errors.orderInfoEmail }">
                     </div>
                 </form>
             </div>
@@ -38,28 +51,61 @@
                 <CheckoutAct :item="activity" />
             </div>
             <div class="disc-line"></div>
-            <div class="join-info">
-                <span class="join-person">參與者資料</span>
-                <input type="checkbox"><span>同訂購人資料</span>
+            <div class="receiver-info">
+                <span class="receiver">參與者資料</span>
+                <input type="checkbox" v-model="sameAsOrderInfo" @change="updateReceiverInfo">
+                <span>同訂購人資料</span>
             </div>
             <form>
                 <div class="form-group">
                     <label for="name">姓名:</label>
-                    <input type="text" id="name">
+                    <!-- <input type="text" id="name" maxlength="50" v-model="receiverInfo.name"> -->
+                    <input type="text" id="receiverName" v-model="receiverInfo.name" maxlength="50"
+                        :class="{ 'error-input': errors.receiverInfoName }">
                 </div>
                 <div class="form-group">
-                    <label for="phone">聯繫電話：</label>
-                    <input type="text" id="phone">
+                    <label for="phone">聯絡電話：</label>
+                    <input type="text" id="receiverPhone" v-model="receiverInfo.phone" maxlength="10"
+                        :class="{ 'error-input': errors.receiverInfoPhone }">
                 </div>
                 <div class="form-group">
                     <label for="email">電子郵箱：</label>
-                    <input type="email" id="email">
+                    <input type="email" id="email" v-model="receiverInfo.email" maxlength="255"
+                        :class="{ 'error-input': errors.receiverInfoEmail }">
+                </div>
+
+                <div class="form-group">
+                    <label for="text">特殊需求備註：<br>(選填)</label>
+                    <textarea id="memo" v-model="memo" maxlength="500" class="large-textarea"></textarea>
+                </div>
+
+            </form>
+            <div class="disc-line-form"></div>
+            <div class="invoicing-title">
+                <span>發票與統編(選填)</span>
+            </div>
+            <form class="invoicing-form">
+                <div class="form-group">
+                    <label for="invoicing">載具編號：</label>
+                    <div class="invoicing-use">
+                        <input type="text" id="invoicing" v-model="invoicingNumber" maxlength="8"
+                            :class="{ 'error-input': errors.invoicingNumber }">
+                        <div class="invoicing-often">
+                            <input type="checkbox" class="invoicing-cb">
+                            <span>設定為常用載具</span>
+                        </div>
+                    </div>
                 </div>
                 <div class="form-group">
-                    <label for="text">特殊需求備註：</label>
-                    <!-- 特殊需求備註要改text格式 -->
-                    <textarea id="memo" v-model="memo" maxlength="500" class="large-textarea"></textarea>
-
+                    <label for="compilation-title">統一編號：</label>
+                    <div class="invoicing-use">
+                        <input type="text" id="compilation" v-model="compilationNumber" maxlength="8"
+                            :class="{ 'error-input': errors.compilationNumber }">
+                        <div class="invoicing-often">
+                            <input type="checkbox" class="invoicing-cb">
+                            <span>設定為常用統編</span>
+                        </div>
+                    </div>
                 </div>
             </form>
         </div>
@@ -77,21 +123,32 @@
                     </div>
                     <div class="form-group">
                         <label for="card-number">信用卡號碼：</label>
-                        <input type="text" id="card-number" class="card-input" maxlength="4">
+                        <input type="text" id="card-number-1" ref="cardNumber1" class="card-input" maxlength="4"
+                            :class="{ 'error-input': errors.creditCardNumber }"
+                            @input="moveToNext($event, 'cardNumber2')">
                         <span>-</span>
-                        <input type="text" class="card-input" maxlength="4">
+                        <input type="text" id="card-number-2" ref="cardNumber2" class="card-input" maxlength="4"
+                            :class="{ 'error-input': errors.creditCardNumber }"
+                            @input="moveToNext($event, 'cardNumber3')">
                         <span>-</span>
-                        <input type="text" class="card-input" maxlength="4">
+                        <input type="text" id="card-number-3" ref="cardNumber3" class="card-input" maxlength="4"
+                            :class="{ 'error-input': errors.creditCardNumber }"
+                            @input="moveToNext($event, 'cardNumber4')">
                         <span>-</span>
-                        <input type="text" class="card-input" maxlength="4">
+                        <input type="text" id="card-number-4" ref="cardNumber4" class="card-input" maxlength="4"
+                            :class="{ 'error-input': errors.creditCardNumber }">
                     </div>
                     <div class="form-group">
                         <label for="expiry-date">有效日期：</label>
-                        <input type="text" id="expiry-date-mm" placeholder="MM" maxlength="2">
+                        <input type="text" id="expiry-date-mm" ref="expiryDate1" placeholder="MM" maxlength="2"
+                            :class="{ 'error-input': errors.expiryDate }" @input="moveToNext($event, 'expiryDate2')">
                         <span>/</span>
-                        <input type="text" id="expiry-date-yy" placeholder="YY" maxlength="2">
-                        <input type="text" id="cvc" placeholder="信用卡背面的三碼" maxlength="3">
+                        <input type="text" id="expiry-date-yy" ref="expiryDate2" placeholder="YY" maxlength="2"
+                            :class="{ 'error-input': errors.expiryDate }" @input="moveToNext($event, 'cvc')">
+                        <input type="text" id="cvc" ref="cvc" placeholder="信用卡背面的三碼" maxlength="3"
+                            :class="{ 'error-input': errors.cvc }">
                     </div>
+
                     <div class="form-group">
                         <div class="save-card-use">
                             <input type="checkbox" id="save-card-cb">
@@ -129,23 +186,30 @@
             </div>
         </div>
         <div class="confirm-checkout">
-            <button @click="submitOrder">確認結帳</button>
+            <button @click="validateForm">確認結帳</button>
         </div>
         <SuccessModal :visible="showSuccessModal" message="結帳成功！" @close="closeModal" />
     </div>
-    
 </template>
 
 
 <script>
 import { useActivityStore } from '../stores/activitycheckout.js';
 import CheckoutAct from '../components/layout/CheckoutAct.vue';
-
 import SuccessModal from '../components/layout/SuccessModal.vue';
+// 登入資料
+import { useLoginStore } from '@/stores/loginStore';
 
 export default {
     components: { CheckoutAct, SuccessModal },
+    setup() {
+        const loginStore = useLoginStore();
 
+        return {
+            loginStore,
+            name: '',
+        }
+    },
     data() {
         return {
             id: null,
@@ -154,18 +218,57 @@ export default {
             activities: [],
             activityId: null,
             activitycheckout: null, // 假设这是你的活动信息存储对象
-            order: {
+            orderInfo: {
+                name: '',
+                phone: '',
+                email: ''
+            },
+            receiverInfo: {
                 name: '',
                 phone: '',
                 email: '',
-                receiverName: '',
-                receiverPhone: '',
-                receiverEmail: '',
-                invoiceNumber: '',
-            }
+                address: {
+                    city: '',
+                    district: '',
+                    detail: ''
+                },
+                preferTime: ''
+            },
+            creditCard: {
+                number1: '',
+                number2: '',
+                number3: '',
+                number4: '',
+                expiryMonth: '',
+                expiryYear: '',
+                cvc: ''
+            },
+            invoicingNumber: '',
+            compilationNumber: '',
+            memo: '',
+            errors: {},
+            sameAsOrderInfo: false,
+            originalReceiverInfo: {
+                name: '',
+                phone: '',
+                email: ''
+            },
+            cities: [],
+            districts: [],
+            formError: '',
         };
     },
     computed: {
+        loginStore() { 
+            return useLoginStore();
+        },
+        uniqueCities() {
+            const cityNames = this.cities.map(city => city.city_name);
+            return [...new Set(cityNames)];
+        },
+        filteredDistricts() {
+            return this.cities.filter(city => city.city_name == this.selectedCity);
+        },
         totalPrice() {
             return this.activitycheckout.totalAmount;
         },
@@ -177,23 +280,137 @@ export default {
         },
     },
     methods: {
-        submitOrder() {
-            // 表单驗證
-            // if (!this.order.name || !this.order.phone || !this.order.email || !this.order.receiverName || !this.order.receiverPhone || !this.order.receiverEmail || !this.addressDetail) {
-            //     alert('請填寫並確認完成所有訂單資料');
-            //     return;
-            // }
+        async fetchCities() {
+            try {
+                const response = await fetch(`${import.meta.env.BASE_URL}Taiwan_address_data.json`);
+                if (!response.ok) {
+                    throw new Error('網絡出現問題，請稍後再試');
+                }
+                this.cities = await response.json();
+            } catch (error) {
+                console.error('無法選取資料:', error);
+            }
+        },
 
+        onCityChange() {
+            this.selectDistrict = '';
+        },
+        validateForm() {
+            this.errors = {};
+
+            // 訂購人信息驗證
+            if (!this.orderInfo.name) {
+                this.errors.orderInfoName = true;
+            }
+            if (!this.orderInfo.phone) {
+                this.errors.orderInfoPhone = true;
+            } else if (!/^09\d{8}$/.test(this.orderInfo.phone)) {
+                this.errors.orderInfoPhone = true;
+            }if (!this.orderInfo.email) {
+                this.errors.orderInfoEmail = true;
+            } else if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(this.orderInfo.email)){
+                this.errors.orderInfoEmail = true;
+            }
+
+            // 收件人信息驗證
+            if (!this.receiverInfo.name) {
+                this.errors.receiverInfoName = true;
+            }
+            if (!this.receiverInfo.phone) {
+                this.errors.receiverInfoPhone = true;
+            } else if (!/^09\d{8}$/.test(this.receiverInfo.phone)) {
+                this.errors.receiverInfoPhone = true;
+            }
+            if (!this.receiverInfo.email) {
+                this.errors.receiverInfoEmail = true;
+            } else if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(this.receiverInfo.email)) {
+                this.errors.receiverInfoEmail = true;
+            }
+            if (!this.selectedCity) {
+                this.errors.receiverInfoAddressCity = true;
+            }
+            if (!this.selectedDistrict) {
+                this.errors.receiverInfoAddressDistrict = true;
+            }
+            if (!this.addressDetail) {
+                this.errors.receiverInfoAddressDetail = true;
+            }
+            if (!this.preferTime) {
+                this.errors.preferTime = true;
+            }
+
+            // 載具和統一編號驗證
+            if (this.invoicingNumber && !/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8}$/.test(this.invoicingNumber)) {
+                this.errors.invoicingNumber = true;
+            }
+
+            // 統一編號驗證
+            if (this.compilationNumber && !/^\d{8}$/.test(this.compilationNumber)) {
+                this.errors.compilationNumber = true;
+            }
+
+            // 信用卡信息驗證
+            const creditCardNumber = `${this.$refs.cardNumber1.value}${this.$refs.cardNumber2.value}${this.$refs.cardNumber3.value}${this.$refs.cardNumber4.value}`;
+        if (!creditCardNumber || !/^\d{16}$/.test(creditCardNumber)) {
+            this.errors.creditCardNumber = true;
+        }
+        const expiryMonth = this.$refs.expiryDate1.value;
+        const expiryYear = this.$refs.expiryDate2.value;
+        const expiryDate = `${expiryMonth}/${expiryYear}`;
+        if (!expiryDate || !/^\d{2}\/\d{2}$/.test(expiryDate)) {
+            this.errors.expiryDate = true;
+        } else {
+            const [month, year] = expiryDate.split('/');
+            const monthNum = parseInt(month, 10);
+            if (monthNum < 1 || monthNum > 12) {
+                this.errors.expiryDate = true;
+            } else {
+                const currentDate = new Date();
+                const expiryDateObj = new Date(`20${year}`, month - 1);
+                if (expiryDateObj < currentDate) {
+                    this.errors.expiryDate = true;
+                }
+            }
+        }
+        if (!this.$refs.cvc.value || !/^\d{3}$/.test(this.$refs.cvc.value)) {
+            this.errors.cvc = true;
+        }
+            // 如果沒有錯誤，提交訂單
+            // 如果有錯誤，顯示錯誤信息
+            if (Object.keys(this.errors).length > 0) {
+                console.log('表單驗證錯誤:', this.errors);
+                this.formError = '請填寫所有必填字段並確保信息正確';
+                window.scrollTo(0, 0);
+                return false;  // 阻止表單提交
+            }
+
+            // 如果沒有錯誤，提交訂單
+            this.submitOrder();
+        },
+        submitOrder() {
             // 顯示成功彈窗
             this.showSuccessModal = true;
 
-            // 清空購物車
-            this.activitycheckout.cleanCart();
         },
         closeModal() {
             this.showSuccessModal = false;
             // 重定向到首頁
             this.$router.push('/');
+        },
+        updateReceiverInfo() {
+            if (this.sameAsOrderInfo) {
+                // 儲存原始收件人資料
+                this.originalReceiverInfo = { ...this.receiverInfo };
+                // 更新收件人資料為訂購人資料
+                this.receiverInfo = { ...this.orderInfo };
+            } else {
+                // 取消勾選時，清空收件人資料
+                this.receiverInfo = {
+                    name: '',
+                    phone: '',
+                    email: ''
+                };
+            }
         },
         moveToNext(event, nextFieldId) {
             if (event.target.value.length === event.target.maxLength) {
@@ -214,9 +431,27 @@ export default {
             }
         },
     },
+    watch: {
+        orderInfo: {
+            handler(newValue) {
+                if (this.sameAsOrderInfo) {
+                    this.receiverInfo = { ...newValue };
+                }
+            },
+            deep: true
+        },
+        sameAsOrderInfo(newValue) {
+            this.updateReceiverInfo();
+        }
+    },
     created() {
         this.activitycheckout = useActivityStore(); // 使用活动存储对象
         this.fetchActivities(); // 加载活动数据
+        this.fetchCities();
+        // 把會員資料帶到訂購人
+        this.orderInfo.name = this.loginStore.userData.mem_name;
+        this.orderInfo.phone = this.loginStore.userData.mem_tel;
+        this.orderInfo.email = this.loginStore.userData.mem_email;
     }
 };
 </script>
@@ -227,6 +462,20 @@ export default {
     width: 90%;
     margin: 20px auto;
 
+}
+
+.error-input {
+    border-color: red;
+}
+
+
+.form-error {
+    color: red;
+    background-color: #ffeeee;
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid red;
+    border-radius: 4px;
 }
 
 .checkout-container {
@@ -292,7 +541,6 @@ export default {
         background: #ffffff;
         border-radius: 20px;
         margin: 40px 0;
-        height: 565px;
 
         .confirm-ord-title {
             height: 48px; //高的問題要解決
@@ -306,66 +554,15 @@ export default {
             background-color: #828282;
         }
 
-        // .act-info {
-        //     display: flex;
-        //     padding-left: 20px;
-        //     height: 30%;
 
-        //     button {
-        //         background-color: transparent;
-        //         border: none;
-        //     }
 
-        //     .act-img {
-        //         height: 80%;
-        //         width: 20%;
-        //         object-fit: cover;
-        //         border-radius: 20px;
-        //         margin: auto 10px;
-
-        //     }
-
-        //     .act-detail {
-        //         display: flex;
-        //         margin: auto 0;
-        //         width: 80%;
-        //         justify-content: space-between;
-
-        //         .act-location {
-        //             h5 {
-        //                 padding-bottom: 10px;
-        //             }
-
-        //             span {
-        //                 line-height: 150%;
-        //                 font-size: 14px;
-        //             }
-
-        //             .mention {
-        //                 font-size: 12px;
-        //                 padding-top: 20px;
-        //             }
-
-        //         }
-
-        //         .act-people {
-        //             margin: auto;
-        //         }
-
-        //         .act-amount {
-        //             margin: auto;
-        //         }
-
-        //     }
-        // }
-
-        .join-info {
+        .receiver-info {
             display: flex;
             margin: 20px 0;
             padding-left: 30px;
             align-items: center;
 
-            .join-person {
+            .receiver {
                 position: relative;
                 margin-right: 80px;
 
@@ -384,6 +581,7 @@ export default {
             input {
                 margin: 0 10px 0 0;
             }
+
         }
 
         form {
@@ -391,7 +589,6 @@ export default {
             flex-direction: column;
             margin-top: 40px;
             gap: 25px;
-            width: 100%;
             padding-left: 20px;
 
             .form-group {
@@ -400,13 +597,20 @@ export default {
                 margin: auto 0;
 
                 label {
-                    flex-basis: 18%;
+                    flex-basis: 20%;
                     margin: auto 0;
                 }
 
                 input {
                     height: 20px;
                     flex-basis: 25%;
+                }
+
+                select {
+                    height: 26px;
+                    flex-basis: 15%;
+                    margin-right: 10px;
+                    background-color: rgba(249, 241, 229, 1);
                 }
 
                 .large-textarea {
@@ -416,9 +620,80 @@ export default {
                     /* 允許垂直調整大小 */
 
                 }
+
+
+            }
+
+        }
+
+        .disc-line-form {
+            margin-top: 20px;
+            height: 1px;
+            background-color: #828282;
+        }
+
+        .invoicing-title {
+            display: flex;
+            margin: 20px 0;
+            padding-left: 30px;
+            position: relative;
+
+            &::before {
+                content: "";
+                position: absolute;
+                height: 18px;
+                width: 2px;
+                background-color: rgba(190, 26, 14, 1);
+                left: 20px;
+                bottom: 0;
+                top: 0;
             }
         }
 
+        .invoicing-form {
+            display: flex;
+            flex-direction: column;
+            margin: 40px 0 20px 0;
+            gap: 25px;
+            padding-left: 20px;
+
+            .form-group {
+                display: flex;
+                align-items: flex-start;
+                margin: auto 0;
+                flex-wrap: wrap;
+
+                label {
+                    flex-basis: 20%;
+                    margin: auto 0;
+                }
+
+                input {
+                    height: 20px;
+                    flex-basis: 0;
+
+                }
+
+                .invoicing-use {
+                    display: flex;
+                    flex-wrap: wrap;
+                    align-items: center;
+
+                    .invoicing-often {
+                        .invoicing-cb {
+                            width: 13px;
+                            height: 13px;
+                            margin: auto 10px auto 30px;
+                        }
+
+                        span {
+                            display: inline-block;
+                            margin: auto 0;
+                        }
+                    }
+                }
+            }
+        }
 
     }
 
@@ -547,6 +822,12 @@ export default {
                             transform: translateX(20px);
                         }
                     }
+
+                    .switch-alert {
+                        color: #be1a0e;
+                        font-size: 12px;
+                        padding-left: 20px;
+                    }
                 }
             }
         }
@@ -593,6 +874,7 @@ export default {
 
     }
 
+
     .confirm-checkout {
         display: flex;
         justify-content: center;
@@ -610,13 +892,47 @@ export default {
             font-size: 16px;
             cursor: pointer;
         }
+        }
+
+
+
+
     }
 
-}
+
 @media screen and (min-width: $md) and (max-width: $xl) {
     .checkout-container {
         width: 80%;
         margin: 50px auto;
+
+        .confirm-info {
+            .ord-info {
+                font-size: 14px;
+
+                form {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 25px;
+                    width: 100%;
+
+                    .form-group {
+                        display: flex;
+                        align-items: flex-start;
+                        margin: auto 0;
+
+                        label {
+                            flex-basis: 25%;
+                            margin: auto 0;
+                        }
+
+                        input {
+                            height: 20px;
+                            flex-basis: 25%;
+                        }
+                    }
+                }
+            }
+        }
 
         .confirm-ord {
 
@@ -631,6 +947,8 @@ export default {
                 height: 1px;
                 background-color: #828282;
             }
+
+
 
             .prod-info {
                 display: block;
@@ -788,29 +1106,17 @@ export default {
                     display: flex;
                     align-items: flex-start;
                     margin: auto 0;
+                    font-size: 14px;
 
                     label {
                         flex-basis: 25%;
                         margin: auto 0;
-                        font-size: 14px;
                     }
 
                     input {
                         height: 20px;
                         flex-basis: 0;
 
-                    }
-
-                    .invoicing-cb {
-                        width: 13px;
-                        height: 13px;
-                        margin: auto 10px auto 30px;
-                    }
-
-                    span {
-                        display: inline-block;
-                        margin: auto 0;
-                        font-size: 14px;
                     }
                 }
             }
@@ -1105,7 +1411,6 @@ export default {
             background: #ffffff;
             border-radius: 20px;
             margin: 40px 0;
-            padding-bottom: 150px;
 
             .confirm-ord-title {
                 font-size: 14px;
@@ -1145,12 +1450,22 @@ export default {
                 font-size: 14px;
 
                 #address-form {
-                    select {
-                        height: 26px;
-                        flex-basis: auto;
-                        margin-right: 10px;
-                        background-color: rgba(249, 241, 229, 1);
-                        margin: 0 10px 10px 0;
+                    display: flex;
+                    flex-wrap: wrap;
+                    align-items: center;
+
+                    .address-group {
+                        display: flex;
+                        flex-wrap: wrap;
+                        flex: 1;
+
+                        select {
+                            height: 26px;
+                            flex-basis: auto;
+                            margin-right: 10px;
+                            background-color: rgba(249, 241, 229, 1);
+                            margin: 0 10px 10px 0;
+                        }
                     }
                 }
 
@@ -1224,22 +1539,30 @@ export default {
 
                     }
 
-                    input {
-                        height: 20px;
-                        flex-basis: 20%;
-                    }
-
-                    .invoicing-cb {
-                        margin: 10px 0;
-                        flex-basis: 20%;
-
-                    }
-
-                    span {
+                    .invoicing-use {
                         display: flex;
-                        margin: auto 0;
-                    }
+                        align-items: center;
+                        flex-wrap: wrap;
+                        margin-top: 10px;
 
+                        input {
+                            height: 20px;
+                            flex-basis: 20%;
+                        }
+
+                        .invoicing-often {
+                            width: auto;
+
+                            .invoicing-cb {
+                                margin: 0 10px 0 20px;
+                            }
+
+                            span {
+                                display: inline-block;
+                                margin: auto 0;
+                            }
+                        }
+                    }
                 }
             }
 
@@ -1283,12 +1606,16 @@ export default {
                             flex-basis: 40%;
                             margin: auto 0;
                             font-size: 14px;
+                            flex-shrink: 0;
+                            flex-grow: 0;
                         }
 
                         .card-input {
                             display: flex;
                             width: 30px;
                             flex-basis: 10%;
+                            flex-shrink: 1;
+                            flex-grow: 1;
                         }
 
                         span {
