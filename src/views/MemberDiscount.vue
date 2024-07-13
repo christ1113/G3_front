@@ -103,7 +103,8 @@ import MemberManageList from '../components/layout/MemberManageList.vue'
             position: absolute;
             top: 0%;
             left: 0%;
-            height: 50%;
+            height: auto;
+            row-gap: 15px;
         }
 
         @media screen and (min-width:577px) and (max-width:996px) {
