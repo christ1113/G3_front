@@ -80,7 +80,7 @@
         <img :src="parseImg(activity.act_img1)" alt="活動圖片">
       </div>
       <div class="card-title">
-        <h5>{{ activity.act_name }}</h5>
+        <h5>{{ activity.act_name }}<span v-if="isPastDate(activity.end_date) && activity.act_type == 0 | activity.act_type == 1" class="status-text">(報名已結束)</span></h5>
       </div>
       <div class="card-date">{{ activity.act_date }}</div>
       <div class="card-time">{{ getFirstSessionTime(activity.sess_time) }}</div>
@@ -118,15 +118,6 @@ export default {
       filterPending: false,  // 標示是否需要重新計算篩選結果
     };
   },
-  // mounted() {
-  //   fetch(`${import.meta.env.BASE_URL}activities.json`)
-  //     .then(response => response.json())
-  //     .then(data => {
-  //       this.activities = data;
-  //       this.responseData = data;
-
-  //     })
-  //     .catch(error => console.error('Error fetching activities:', error));
   mounted() {
     const body = {
       // 確保身體定義並包含正確的數據
@@ -158,9 +149,11 @@ export default {
   computed: {
 
     filteredActivities() {
+      let filtered = this.activities;
+
       if (this.filterPending) {
         // 對 activities 數據進行篩選
-        return this.activities.filter(activity => {
+        filtered = filtered.filter(activity => {
           // 檢查活動的狀態是否匹配當前篩選條件
           const matchesStatus = this.currentStatus === '全部' || activity.act_status == this.currentStatus;
           // 檢查活動的類型是否匹配當前篩選條件
@@ -171,12 +164,13 @@ export default {
             (new Date(activity.act_date) >= new Date(this.range.start) && new Date(activity.act_date) <= new Date(this.range.end));
           // 檢查活動的標題是否包含搜索關鍵字
           const matchesSearch = activity.act_name.includes(this.search);
+          const excludeType2 = !(activity.act_type == 2 && (this.currentStatus === '進行中' || this.currentStatus === '已結束'));
           // 只有當活動同時滿足狀態、類型和搜索條件時，才會被篩選出來
-          return matchesStatus && matchesType && matchesSearch && matchesLoc && matchesDate;
+          return matchesStatus && matchesType && matchesSearch && matchesLoc && matchesDate && excludeType2;
         });
+
       }
-      return this.activities; // 初始返回所有活動
-    }
+      return filtered.sort((a, b) => new Date(b.act_date) - new Date(a.act_date));    }
   },
   methods: {
     getFirstSessionTime(sess_time) {
@@ -190,6 +184,24 @@ export default {
       return new URL(`../assets/pic/activity/${file}`, import.meta.url).href;
     },
     goToActivityDetail(id) {
+      const activity = this.activities.find(activity => activity.act_id === id);
+      if (!activity) {
+        console.error(`Activity with id ${id} not found.`);
+        return;
+      }
+
+      // if (activity.act_status == '已結束') {
+      //   // 如果活動狀態為已結束，顯示彈窗或其他提示
+      //   alert('活動報名已結束');
+      // }
+
+      if (activity.act_type == 2 ) {
+        // 如果活動狀態為已結束，顯示彈窗或其他提示
+        alert('文創市集無需報名: 詳請請到粉絲專頁查看');
+        return; // 防止進一步操作
+      }
+
+      // 導航到活動詳細頁面
       this.$router.push({ name: 'activitydetail', params: { id } });
     },
     filterByStatus(status) {
@@ -197,7 +209,6 @@ export default {
       this.currentStatus = status;
     },
     filterByType(act_type) {
-      console.log('Type filter clicked:', act_type);
       this.filterPending = true;
       this.currentType = act_type;
     },
@@ -238,7 +249,11 @@ export default {
       this.toggleFilterPopup();
       // this.range.start = null;
       // this.range.end = null;
-    }
+    },
+    isPastDate(date) {
+    const today = new Date().toISOString().split('T')[0];
+    return new Date(date) < new Date(today);
+  }
   }
 }
 </script>
