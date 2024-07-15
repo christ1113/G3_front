@@ -19,7 +19,8 @@
   </section>
   <section class="section-activity-info" v-if="selectedActivity">
     <div class="activity-info">
-      <h4>{{ selectedActivity.act_loc }} | {{ selectedActivity.act_name }}</h4>
+      <h4>{{ selectedActivity.act_loc }} | {{ selectedActivity.act_name }}<span
+          v-if="isPastDate(selectedActivity.end_date)" class="status-text">(報名已結束)</span></h4>
       <h5>-活動介紹-</h5>
       <p>油紙傘彩繪課程是一個結合傳統工藝與現代藝術的手作體驗活動。參加者將學習如何製作和裝飾油紙傘，了解這項古老技藝的文化背景，並創作出獨一無二的藝術作品。本課程適合所有年齡層，無需任何手工或繪畫基礎。</p>
       <h5>-活動內容-</h5>
@@ -66,11 +67,14 @@
       <div class="session-time">
         <h5>場次時間</h5>
         <div class="time">
-
-          <button @click="chooseTime('10:00~12:00')" :class="{ 'choose-time': currentTime === '10:00~12:00' }">
+          <button @click="chooseTime('10:00~12:00')"
+            :class="['session-button', { 'choose-time': currentTime == '10:00~12:00', 'disabled': isPastDate(selectedActivity.end_date) }]"
+            :disabled="isPastDate(selectedActivity.end_date)">
             {{ getFirstSessionTime(selectedActivity.sess_time) }}
           </button>
-          <button @click="chooseTime('13:00~15:00')" :class="{ 'choose-time': currentTime === '13:00~15:00' }">
+          <button @click="chooseTime('13:00~15:00')"
+            :class="['session-button', { 'choose-time': currentTime == '13:00~15:00', 'disabled': isPastDate(selectedActivity.end_date) }]"
+            :disabled="isPastDate(selectedActivity.end_date)">
             {{ getSecondSessionTime(selectedActivity.sess_time) }}
           </button>
         </div>
@@ -89,12 +93,13 @@
         <p>NT${{ total }}</p>
       </div>
       <hr>
-      <button class="btn" @click="reserveActivity">
-        立即預約
+      <button class="btn" @click="reserveActivity" :class="{ 'disabled-btn': isPastDate(selectedActivity.end_date) }"
+        :disabled="isPastDate(selectedActivity.end_date)">
+        {{ isPastDate(selectedActivity.end_date) ? '報名已結束' : '立即預約' }}
       </button>
 
     </div>
-    
+
   </section>
 
   <section class="section-activity-notice">
@@ -189,7 +194,7 @@ export default {
           this.selectedActivity.act_loc,
           this.parseImg(this.selectedActivity.act_img1));
         this.router.push(`/checkout_act?id=${this.$route.params.id}&time=${this.currentTime}`);
-      } else{
+      } else {
         alert('請先選擇場次時間');
       }
     },
@@ -216,37 +221,41 @@ export default {
       this.count -= 1;
     },
     getFirstSessionTime(sess_time) {
+      if (!sess_time) return '';
       return sess_time.split('、')[0].trim();
     },
     getSecondSessionTime(sess_time) {
+      if (!sess_time) return '';
       return sess_time.split('、')[1].trim();
-    }
+    },
+    isPastDate(date) {
+      const today = new Date().toISOString().split('T')[0];
+      return new Date(date) < new Date(today);
+    },
   },
   mounted() {
+    const id = this.$route.params.id;
     const body = {
-    // 確保身體定義並包含正確的數據
-  };
+      act_id: id,
+      // 其他必要的身體數據，如果需要的話
+    };
 
-  fetch(`/cid101/g3/api/activity.php`, {
-    method: "POST",
-    body: JSON.stringify(body)
-  })
-    .then(res => {
-      if (!res.ok) {
-        throw new Error('Network response was not ok ' + res.statusText);
-      }
-      return res.json();
+    fetch(`/cid101/g3/api/activity.php`, {
+      method: "POST",
+      body: JSON.stringify(body)
     })
-    .then(json => {
-      console.log(json);
-      this.activities = json["data"]["list"];
-      if (this.activities.length > 0) {
-        this.selectedActivity = this.activities[0]; // 預設選擇第一個活動
-      }
-    })
-    .catch(error => {
-      console.error('There has been a problem with your fetch operation:', error);
-    });
+      .then(res => {
+        if (!res.ok) {
+          throw new Error('Network response was not ok ' + res.statusText);
+        }
+        return res.json();
+      })
+      .then((json) => {
+        this.selectedActivity = json.data; // 假設從PHP返回的數據中有一個data屬性包含所有活動詳細信息
+      })
+      .catch(error => {
+        console.error('There has been a problem with your fetch operation:', error);
+      });
 
     const map = L.map(this.$refs.mapContainer, {
       center: [22.602995, 120.306013],

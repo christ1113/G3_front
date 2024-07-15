@@ -16,6 +16,7 @@
                         <h5>{{ activity.loc }}|{{ activity.title }}</h5>
                         <p>活動日期:{{ activity.date }}</p>
                         <p>活動時間:{{ activity.time1 }}</p>
+                        <p>活動人數:{{ activity.time1 }}</p>
                         <p>活動費用:{{ activity.subtotal }}</p>
                     </div>
                     <div class="cancel">

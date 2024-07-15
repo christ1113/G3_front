@@ -415,12 +415,20 @@ export default {
             // 如果答完五題
             if (this.currentQuestionIndex == this.selectQuestionArray.length && this.correctAnswers >= 3) {
                 // 顯示優惠券
+                quizBox.style.display = 'none';
+
                 this.showDiscountFrame();
+                console.log(this.correctAnswers);
 
             }
             else if (this.currentQuestionIndex == this.selectQuestionArray.length && this.correctAnswers < 3) {
                 // 顯示不及格跟再玩一次
+                quizBox.style.display = 'none';
+
                 this.showFailedFrame();
+                console.log(this.correctAnswers);
+                quizBox.style.display = 'none';
+
             }
         },
         // show答題結果視窗
@@ -433,13 +441,24 @@ export default {
         showDiscountFrame() {
             const discountFrame = document.querySelector('.discount-frame');
 
-            discountFrame.style.display = 'flex';
+            // 檢查元素是否存在
+            if (discountFrame) {
+                discountFrame.style.display = 'flex';
+            } else {
+                console.error('discount-frame element not found');
+            }
         },
-        //show不及格視窗
+
+        // show不及格視窗
         showFailedFrame() {
             const failedFrame = document.querySelector('.failed-frame');
 
-            failedFrame.style.display = 'flex';
+            // 檢查元素是否存在
+            if (failedFrame) {
+                failedFrame.style.display = 'flex';
+            } else {
+                console.error('failed-frame element not found');
+            }
         },
 
         // 重設所有設定
@@ -842,7 +861,7 @@ export default {
                         @media (max-width: 576px) {
                             width: 100px;
                             height: 30px;
-                            margin:0 auto 2% auto;
+                            margin: 0 auto 2% auto;
                         }
 
                         >p {
@@ -883,7 +902,7 @@ export default {
                         @media (max-width: 576px) {
                             width: 100px;
                             height: 30px;
-                            margin:0 auto 2% auto;
+                            margin: 0 auto 2% auto;
                         }
 
                         >p {
