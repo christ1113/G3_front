@@ -198,7 +198,7 @@ export default {
         // 登入判斷
         async clickLogin() {
             try {
-                let url = path + 'memberData.php';
+                let url = path + 'member_login.php';
                 const response = await fetch(url, {
                     method: 'POST',
                     headers: {
@@ -234,13 +234,6 @@ export default {
         async register() {
             try {
                 let url = path + 'member_add.php';
-                // let data = JSON.stringify({
-                //         email: this.newEmail,
-                //         password: this.newPassword,
-                //         gender: this.gender,
-                //         birth: this.birthDate
-                //     });
-                // console.log("----", data);
                 const response = await fetch(url, {
                     method: 'POST',
                     headers: {
@@ -264,13 +257,27 @@ export default {
                 console.log(data);
                 if (data.code === 200) {
                     alert(data.msg);
+                    this.showContent('login');
+                    this.showLogin();
+                    this.newEmail= '';
+                    this.newPassword= '';
+                    this.checkPassword= '';
+                    this.gender= 'M';
+                    this.birthDate= '';
                 } else {
                     alert(data.msg);
+                    this.showContent('login');
+                    this.showLogin();
+                    this.newEmail= '';
+                    this.newPassword= '';
+                    this.checkPassword= '';
+                    this.gender= 'M';
+                    this.birthDate= '';
                 }
-            
+
             } catch (error) {
                 console.error('Error:', error);
-                alert('註冊籌公');
+                alert('註冊失敗: ' + error.message);
             }
         },
 

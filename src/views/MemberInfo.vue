@@ -21,26 +21,26 @@
                         </div>
                     </div>
                     <div class="content">
-                        <h5>使用者 ： {{this.loginStore.userData.mem_name}}</h5>
+                        <h5>使用者 ： {{editedData.mem_name}}</h5>
                         <h5>暱稱 ： <input type="text"></h5>
                         <h5>信箱 ： {{this.loginStore.userData.mem_email}}</h5>
-                        <h5>電話 ： <input type="text" v-model="this.loginStore.userData.mem_tel"></h5>
+                        <h5>電話 ： <input type="text" v-model="editedData.mem_tel"></h5>
                         <h5>性別 ： 
-                            <input type="radio" id="gender-man" name="gender" value="M" :checked="this.loginStore.userData.mem_gender === 'M' " />
+                            <input type="radio" id="gender-man" name="gender" value="M" :checked="editedData.mem_gender === 'M' " />
                             <label for="gender-man">男性</label>
-                            <input type="radio" id="gender-girl" name="gender" value="F" :checked="this.loginStore.userData.mem_gender === 'F' "/>
+                            <input type="radio" id="gender-girl" name="gender" value="F" :checked="editedData.mem_gender === 'F' "/>
                             <label for="gender-girl">女性</label>
-                            <input type="radio" id="gender-else" name="gender" value="O" :checked="this.loginStore.userData.mem_gender === 'O' " />
+                            <input type="radio" id="gender-else" name="gender" value="O" :checked="editedData.mem_gender === 'O' " />
                             <label for="gender-else">其他</label>
                         </h5>
                         <h5>生日 ： 
-                            <input type="date" value="2000-06-19" v-model="this.loginStore.userData.mem_birth" />
+                            <input type="date" value="2000-06-19" v-model="editedData.mem_birth" />
                         </h5>
-                        <h5>地址 ： <input type="text" v-model="this.loginStore.userData.mem_addr"></h5>
-                        <h5>載具編號 ： <input type="text" v-model="this.loginStore.userData.mem_carrier"></h5>
-                        <h5>統一編號 ： <input type="text" v-model="this.loginStore.userData.mem_company"></h5>
+                        <h5>地址 ： <input type="text" v-model="editedData.mem_addr"></h5>
+                        <h5>載具編號 ： <input type="text" v-model="editedData.mem_carrier"></h5>
+                        <h5>統一編號 ： <input type="text" v-model="editedData.mem_company"></h5>
                     </div>
-                    <button class="meminfo-btn">
+                    <button class="meminfo-btn" @click="saveMemberInfo()">
                         儲存
                     </button>
                 </div>
@@ -74,6 +74,13 @@ export default{
         if (!this.loginStore.userData.mem_carrier) {
             this.loginStore.userData.mem_carrier = '/';
         }
+        this.editedData.mem_name =  this.loginStore.userData.mem_name;
+        this.editedData.mem_tel =  this.loginStore.userData.mem_tel;
+        this.editedData.mem_gender =  this.loginStore.userData.mem_gender;
+        this.editedData.mem_birth =  this.loginStore.userData.mem_birth;
+        this.editedData.mem_addr =  this.loginStore.userData.mem_addr;
+        this.editedData.mem_carrier =  this.loginStore.userData.mem_carrier;
+        this.editedData.mem_company =  this.loginStore.userData.mem_company
         
     },
     components:{
@@ -85,46 +92,61 @@ export default{
         }
     },
     methods: {
-        saveMemberInfo() {
-        const url = path + 'member_updata.php';
+        async saveMemberInfo() {
+            try {
+                const url = path + 'member_updata.php'; 
 
-        // 取得更新後的會員資料
-        const updatedData = {
-            mem_name: this.editedData.mem_name,
-            mem_tel: this.editedData.mem_tel,
-            mem_gender: this.editedData.mem_gender,
-            mem_birth: this.editedData.mem_birth,
-            mem_addr: this.editedData.mem_addr,
-            mem_carrier: this.editedData.mem_carrier,
-            mem_company: this.editedData.mem_company
-        };
+                const updatedData = {
+                mem_name: this.editedData.mem_name,
+                mem_tel: this.editedData.mem_tel,
+                mem_gender: this.editedData.mem_gender,
+                mem_birth: this.editedData.mem_birth,
+                mem_addr: this.editedData.mem_addr,
+                mem_carrier: this.editedData.mem_carrier,
+                mem_company: this.editedData.mem_company,
+                mem_email: this.loginStore.userData.mem_email
+                };
 
-        // 使用 fetch 發送 POST 請求到後端
-        fetch(url, {
-            method: 'POST',
-            headers: {
-            'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(updatedData)
-        })
-        .then(response => {
-            if (!response.ok) {
-            throw new Error('Network response was not ok ' + response.statusText);
+                console.log('Sending data:', updatedData);
+
+                const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(updatedData)
+                });
+
+                if (!response.ok) {
+                throw new Error('Network response was not ok');
+                }
+
+                const data = await response.json();
+                this.data = data;
+
+                console.log('Parsed JSON:', data);
+                if (data.error) {
+                throw new Error(data.msg || 'Unknown error');
+                }
+
+                console.log('更新成功:', data);
+                // 在更新成功後，可以做一些提示給用戶的處理，例如顯示成功消息
+                // this.showToast('更新成功');
+                this.$store.commit('updateUserData', updatedData);
+
+            } catch (error) {
+                console.error('更新失敗:', error);
+                // 在這裡處理錯誤，例如顯示錯誤消息給用戶
+                // this.showToast('更新失敗: ' + error.message);
+                this.error = '更新失敗: ' + error.message;
+
+            } finally {
+                this.loading = false;
             }
-            return response.json();
-        })
-        .then(json => {
-            console.log('更新成功:', json);
-            // 可以在更新成功後做一些處理，例如提示使用者更新成功
-            // 更新用戶資料，例如使用 Vuex 的 commit 方法
-            this.$store.commit('updateUserData', updatedData);
-        })
-        .catch(error => {
-            console.error('There has been a problem with your fetch operation:', error);
-            // 可以在更新失敗後做一些處理，例如提示使用者更新失敗
-        });
-        }
     }
+    }
+
+
 
 }
 
